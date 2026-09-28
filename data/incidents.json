@@ -1,6 +1,967 @@
 {
   "incidents": [
     {
+      "id": "INC-2026-1061",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:47:07Z",
+      "root_cause": "Employee dissatisfaction or workplace conflict leading to hostile behavior, possibly triggered by recent performance review or interpersonal dispute.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:47:07Z",
+      "resolved_at": "2026-09-28T18:47:32Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User \"hostile_employee@sentinelcorp.internal\" posted profanity and a direct threat in Microsoft Teams #general and Helpdesk, stating \"you idiot bastard, I will ruin you and make you pay\". The content was flagged by Teams DLP as high\u2011severity harassment and verbal threat.",
+        "possible_root_cause": "Employee dissatisfaction or workplace conflict leading to hostile behavior, possibly triggered by recent performance review or interpersonal dispute.",
+        "indicators": [
+          "Profanity and abusive insults detected in Teams chat",
+          "Explicit threat of harm: \"I will ruin you\""
+        ],
+        "investigation_steps": [
+          "Collect full chat transcript and metadata (timestamps, IP 10.0.8.44, device info)",
+          "Verify employee badge status and recent access logs",
+          "Notify HR, Security Operations, and Legal for immediate review"
+        ],
+        "recommended_response": [
+          "Revoke employee badge and all physical access",
+          "Terminate Teams session and block IP 10.0.8.44",
+          "Preserve all evidence (chat logs, screenshots, IP logs) for forensic analysis"
+        ],
+        "reason_for_recommendation": "Immediate containment is required to prevent potential escalation, protect staff safety, and comply with corporate security policy.",
+        "historical_evidence": "Past incidents (HIST-001) with 95%, 87%, and 79% similarity were successfully resolved by revoking the employee\u2019s badge, notifying security, terminating the digital session, and preserving evidence. These actions prevented further harassment and ensured a swift, compliant response.",
+        "prevention_suggestions": [
+          "Deploy real\u2011time profanity and threat detection with automatic escalation to security",
+          "Conduct regular harassment policy training and establish clear reporting channels"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1061"
+    },
+    {
+      "id": "INC-2026-1060",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:46:16Z",
+      "root_cause": "Identifying attack vectors...",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:46:16Z",
+      "resolved_at": "2026-09-28T18:46:28Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User \"hostile_employee@sentinelcorp.internal\" from IP 10.0.8.44 posted profanity and direct threats in Microsoft Teams #general and Helpdesk, triggering a high\u2011severity DLP alert for targeted harassment and verbal threats.",
+        "possible_root_cause": "Disgruntled employee with potential mental health issues and access to internal systems; lack of real\u2011time threat monitoring and immediate badge revocation procedures.",
+        "indicators": [
+          "Profanity and targeted insults detected by Teams DLP",
+          "Verbal threat language: \"I will ruin you and make you pay\""
+        ],
+        "investigation_steps": [
+          "Isolate the user\u2019s session and terminate active Teams connections",
+          "Collect and preserve chat logs, badge access logs, and any related system activity for forensic analysis"
+        ],
+        "recommended_response": [
+          "Revoke the employee\u2019s badge and all system access immediately",
+          "Notify physical security and HR to monitor for potential escalation and ensure workplace safety"
+        ],
+        "reason_for_recommendation": "Immediate containment is required to prevent potential physical harm or sabotage, following proven protocols for hostile statements.",
+        "historical_evidence": "Past incidents INC-2026-1059, INC-2026-1058, and INC-2026-1057 involved similar violent threats and were successfully mitigated by revoking badge access, rotating credentials, enabling MFA, and enforcing real\u2011time threat monitoring. These actions prevented unauthorized persistence and ensured zero harm.",
+        "prevention_suggestions": [
+          "Implement continuous real\u2011time threat monitoring and automated badge revocation for flagged behavior",
+          "Enforce key\u2011only authentication with MFA and regular credential rotation to limit insider threat exposure"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "INC-2026-1059",
+            "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Disgruntled contractor with access to internal Slack and campus badge system, possibly experiencing personal or professional grievances, combined with insufficient real\u2011time threat monitoring and lack of immediate badge revocation procedures.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1059 - Threat to Life & Violent Statement Alert: 'he was killing me'. Root Cause: Disgruntled contractor with access to internal Slack and campus badge system, possibly experiencing personal or professional grievances, combined with insufficient real\u2011time threat monitoring and lack of immediate badge revocation procedures.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1058",
+            "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Disgruntled contractor with potential mental health issues or intent to sabotage; possible insider threat or personal grievance.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1058 - Threat to Life & Violent Statement Alert: 'he was killing me'. Root Cause: Disgruntled contractor with potential mental health issues or intent to sabotage; possible insider threat or personal grievance.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1057",
+            "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1057 - Threat to Life & Violent Statement Alert: 'he was killing me'. Root Cause: Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1060"
+    },
+    {
+      "id": "INC-2026-1059",
+      "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User posted violent and threatening statement: 'he was killing me, I will harm anyone on site and destroy the office'.",
+      "source_ip": "172.16.40.15",
+      "username": "contractor_disgruntled@sentinelcorp.internal",
+      "affected_system": "Internal Slack & Campus Badge Access",
+      "additional_logs": "Slack DLP Alert: Critical ThreatMatch 'killing me' 'harm anyone' 'destroy'. Origin: Campus Building B.",
+      "timestamp": "2026-09-28T18:45:44Z",
+      "root_cause": "Disgruntled contractor with access to internal Slack and campus badge system, possibly experiencing personal or professional grievances, combined with insufficient real\u2011time threat monitoring and lack of immediate badge revocation procedures.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:45:44Z",
+      "resolved_at": "2026-09-28T18:46:14Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User contractor_disgruntled@sentinelcorp.internal posted violent threats: \"he was killing me, I will harm anyone on site and destroy the office\" detected by Slack DLP and linked to campus building B. The threat includes direct intent to kill, harm, and property destruction.",
+        "possible_root_cause": "Disgruntled contractor with access to internal Slack and campus badge system, possibly experiencing personal or professional grievances, combined with insufficient real\u2011time threat monitoring and lack of immediate badge revocation procedures.",
+        "indicators": [
+          "killing me",
+          "harm anyone",
+          "destroy office"
+        ],
+        "investigation_steps": [
+          "Notify campus security and local law enforcement immediately",
+          "Revoke campus badge and disable physical access for the user",
+          "Terminate the user\u2019s Slack session and lock the account",
+          "Preserve all Slack logs, IP logs, and badge access records for forensic analysis"
+        ],
+        "recommended_response": [
+          "Revoke campus badge and disable physical access",
+          "Terminate Slack session and lock account",
+          "Notify campus security and local law enforcement",
+          "Preserve evidence and initiate forensic investigation"
+        ],
+        "reason_for_recommendation": "The language contains explicit threats to life and property, meeting the high\u2011severity criteria. Immediate containment of physical and digital access is essential to prevent potential harm.",
+        "historical_evidence": "Past incidents (HIST-001) with 95%, 87%, and 79% similarity were successfully resolved by revoking physical access, terminating digital sessions, and notifying security. These actions prevented escalation and ensured safety, demonstrating high confidence in this approach.",
+        "prevention_suggestions": [
+          "Implement real\u2011time threat detection and automated badge revocation for flagged language in internal communications",
+          "Conduct regular security awareness training focusing on threat recognition and reporting procedures"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1059"
+    },
+    {
+      "id": "INC-2026-1058",
+      "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User posted violent and threatening statement: 'he was killing me, I will harm anyone on site and destroy the office'.",
+      "source_ip": "172.16.40.15",
+      "username": "contractor_disgruntled@sentinelcorp.internal",
+      "affected_system": "Internal Slack & Campus Badge Access",
+      "additional_logs": "Slack DLP Alert: Critical ThreatMatch 'killing me' 'harm anyone' 'destroy'. Origin: Campus Building B.",
+      "timestamp": "2026-09-28T18:44:59Z",
+      "root_cause": "Disgruntled contractor with potential mental health issues or intent to sabotage; possible insider threat or personal grievance.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:44:59Z",
+      "resolved_at": "2026-09-28T18:45:32Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User contractor_disgruntled@sentinelcorp.internal posted violent threats: \"he was killing me, I will harm anyone on site and destroy the office\" triggering Slack DLP and campus badge access alerts.",
+        "possible_root_cause": "Disgruntled contractor with potential mental health issues or intent to sabotage; possible insider threat or personal grievance.",
+        "indicators": [
+          "\"killing me\" phrase",
+          "\"harm anyone\" phrase",
+          "\"destroy\" phrase",
+          "Slack DLP alert",
+          "Campus Badge Access alert from Building B",
+          "Source IP 172.16.40.15"
+        ],
+        "investigation_steps": [
+          "Notify campus security and local law enforcement",
+          "Revoke badge access for contractor_disgruntled@sentinelcorp.internal",
+          "Terminate Slack session and lock account",
+          "Preserve all digital evidence (Slack logs, IP logs, badge access logs)",
+          "Conduct forensic analysis of account activity and IP usage"
+        ],
+        "recommended_response": [
+          "Immediate badge revocation and physical security lockdown of Building B",
+          "Terminate all digital sessions for the user",
+          "Notify law enforcement and internal incident response team",
+          "Initiate incident debrief and post\u2011mortem"
+        ],
+        "reason_for_recommendation": "The statement contains explicit threats to life and property, meeting the high\u2011severity criteria for immediate containment and law enforcement involvement.",
+        "historical_evidence": "Past incidents (HIST-001) with 95%, 87%, and 79% similarity were resolved by revoking physical and digital access, notifying security, terminating sessions, and preserving evidence, resulting in safe resolution and no harm.",
+        "prevention_suggestions": [
+          "Deploy real\u2011time threat detection in internal messaging platforms",
+          "Enforce stricter access controls and monitor contractor accounts",
+          "Conduct regular security awareness and mental health support training"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1058"
+    },
+    {
+      "id": "INC-2026-1057",
+      "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User posted violent and threatening statement: 'he was killing me, I will harm anyone on site and destroy the office'.",
+      "source_ip": "172.16.40.15",
+      "username": "contractor_disgruntled@sentinelcorp.internal",
+      "affected_system": "Internal Slack & Campus Badge Access",
+      "additional_logs": "Slack DLP Alert: Critical ThreatMatch 'killing me' 'harm anyone' 'destroy'. Origin: Campus Building B.",
+      "timestamp": "2026-09-28T18:42:35Z",
+      "root_cause": "Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:42:35Z",
+      "resolved_at": "2026-09-28T18:43:20Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User contractor_disgruntled@sentinelcorp.internal posted violent threats: \"he was killing me, I will harm anyone on site and destroy the office\" triggering Slack DLP and campus badge access alerts.",
+        "possible_root_cause": "Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.",
+        "indicators": [
+          "\"killing me\"",
+          "\"harm anyone\"",
+          "\"destroy\"",
+          "Slack DLP alert: Critical ThreatMatch",
+          "Campus Building B badge activity"
+        ],
+        "investigation_steps": [
+          "Isolate and terminate user\u2019s digital session (Slack, VPN, internal apps)",
+          "Revoke physical badge and disable access card",
+          "Preserve all logs, Slack messages, badge logs, and network traffic for forensic analysis",
+          "Notify campus security and local law enforcement",
+          "Engage HR and legal for incident reporting and potential disciplinary action"
+        ],
+        "recommended_response": [
+          "Revoke badge and terminate all user accounts immediately",
+          "Lock down campus building B access points pending investigation",
+          "Notify campus security and local police of potential threat",
+          "Conduct forensic analysis of user activity and network logs",
+          "Implement temporary perimeter firewall rules and enforce MFA for all accounts"
+        ],
+        "reason_for_recommendation": "The statement contains direct threats to life and property, requiring immediate containment to prevent potential harm. Historical incidents with identical threat language were resolved by rapid credential revocation, MFA enforcement, and physical access control, demonstrating high confidence in these actions.",
+        "historical_evidence": "Similar incidents (INC-2026-1056, INC-2026-1053, INC-2026-1048) involved violent hostile statements and were successfully mitigated by revoking credentials, enabling MFA, and applying perimeter firewall rules. These actions prevented unauthorized persistence and potential physical harm, as documented in the post\u2011mortems.",
+        "prevention_suggestions": [
+          "Enforce key\u2011only authentication with continuous port exposure monitoring",
+          "Implement real\u2011time threat detection and automated badge revocation for hostile communications",
+          "Provide mandatory mental\u2011health support and grievance channels for employees",
+          "Maintain an up\u2011to\u2011date incident response playbook for physical and digital threats"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "INC-2026-1056",
+            "title": "Toxic Workplace Communication & Abusive Harassment",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Identifying attack vectors...",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1056 - Toxic Workplace Communication & Abusive Harassment. Root Cause: Identifying attack vectors.... Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1053",
+            "title": "Toxic Workplace Communication & Abusive Harassment",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1053 - Toxic Workplace Communication & Abusive Harassment. Root Cause: Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1048",
+            "title": "Toxic Workplace Communication & Abusive Harassment",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Insider threat driven by employee disgruntlement and possible personal or mental\u2011health issues, leading to hostile verbal threats toward colleagues.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1048 - Toxic Workplace Communication & Abusive Harassment. Root Cause: Insider threat driven by employee disgruntlement and possible personal or mental\u2011health issues, leading to hostile verbal threats toward colleagues.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1057"
+    },
+    {
+      "id": "INC-2026-1056",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:42:12Z",
+      "root_cause": "Identifying attack vectors...",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:42:12Z",
+      "resolved_at": "2026-09-28T18:42:28Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User used profanity and threats in Microsoft Teams, indicating potential physical or psychological harm.",
+        "possible_root_cause": "Employee frustration and lack of conflict resolution mechanisms.",
+        "indicators": [
+          "Profanity detected",
+          "Verbal threat phrase"
+        ],
+        "investigation_steps": [
+          "Collect chat logs and metadata",
+          "Notify HR and security",
+          "Isolate user session"
+        ],
+        "recommended_response": [
+          "Revoke user badge and access",
+          "Notify local security and law enforcement",
+          "Terminate Teams session immediately"
+        ],
+        "reason_for_recommendation": "Immediate containment prevents escalation and protects staff safety.",
+        "historical_evidence": "Past incidents (HIST-001) with 95%, 87%, and 79% similarity were mitigated by revoking access, notifying security, and terminating sessions, leading to successful resolution.",
+        "prevention_suggestions": [
+          "Implement real-time harassment monitoring",
+          "Provide employee conflict resolution training"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1056"
+    },
+    {
+      "id": "INC-2026-1055",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "INVESTIGATING",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:42:03Z",
+      "root_cause": null,
+      "investigation_process": null,
+      "actions_taken": null,
+      "successful_resolution": null,
+      "analyst_feedback": null,
+      "lessons_learned": null,
+      "created_at": "2026-09-28T18:42:03Z",
+      "resolved_at": null,
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User hostile_employee@sentinelcorp.internal posted profanity and threats in Microsoft Teams #general and Helpdesk, detected by DLP monitor.",
+        "possible_root_cause": "Disgruntled employee with workplace conflict, possibly triggered by recent performance review or interpersonal dispute.",
+        "indicators": [
+          "Profanity detected in Teams messages",
+          "Verbal threat phrase 'I will ruin you and make you pay'",
+          "High\u2011severity DLP alert"
+        ],
+        "investigation_steps": [
+          "Collect Teams chat logs, timestamps, and metadata",
+          "Verify user identity and access logs",
+          "Notify HR, IT security, and physical security",
+          "Preserve evidence for legal review"
+        ],
+        "recommended_response": [
+          "Terminate user's session and revoke all access badges",
+          "Notify physical security and law enforcement if threat escalates",
+          "Preserve all chat logs and device data for forensic analysis",
+          "Notify affected employees and provide support resources"
+        ],
+        "reason_for_recommendation": "Immediate containment prevents potential escalation to physical harm; evidence preservation supports legal action and internal investigation.",
+        "historical_evidence": "All three Hindsight memories (HIST-001) involved similar abusive language and threats. In each case, mitigation actions included revoking access, terminating sessions, and preserving evidence, which led to successful resolution and no further incidents.",
+        "prevention_suggestions": [
+          "Implement stricter DLP policies and real\u2011time monitoring of harassment content",
+          "Conduct regular employee training on harassment, reporting procedures, and digital communication standards"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": null
+    },
+    {
+      "id": "INC-2026-1054",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "INVESTIGATING",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:40:46Z",
+      "root_cause": null,
+      "investigation_process": null,
+      "actions_taken": null,
+      "successful_resolution": null,
+      "analyst_feedback": null,
+      "lessons_learned": null,
+      "created_at": "2026-09-28T18:40:46Z",
+      "resolved_at": null,
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User hostile_employee@sentinelcorp.internal sent profanity and direct threats in Microsoft Teams, indicating potential intent to cause harm.",
+        "possible_root_cause": "Insider threat driven by employee disgruntlement and intent to inflict physical or reputational damage.",
+        "indicators": [
+          "Profanity and abusive insults detected in Teams chat",
+          "Verbal threat: \"I will ruin you and make you pay\""
+        ],
+        "investigation_steps": [
+          "Isolate user session and terminate all active Teams connections",
+          "Preserve chat logs and device activity for forensic analysis",
+          "Notify HR, security, and physical security teams",
+          "Collect device logs and verify no malicious payloads or unauthorized access"
+        ],
+        "recommended_response": [
+          "Revoke employee badge and all physical access rights",
+          "Terminate digital session and block account across all corporate services",
+          "Notify physical security to monitor premises and ensure safety of colleagues",
+          "Preserve all evidence for legal and compliance purposes"
+        ],
+        "reason_for_recommendation": "Immediate containment is required to prevent potential physical harm and mitigate insider threat, following proven high\u2011severity protocols.",
+        "historical_evidence": "Similar incidents (INC-2026-1053, INC-2026-1048) were resolved by revoking access, rotating credentials, enabling MFA, and applying perimeter firewall rules, resulting in zero unauthorized persistence and verified mitigation.",
+        "prevention_suggestions": [
+          "Enforce key\u2011only authentication with continuous port exposure monitoring",
+          "Implement employee assistance and mandatory reporting channels to address disgruntlement and mental health concerns"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "INC-2026-1053",
+            "title": "Toxic Workplace Communication & Abusive Harassment",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1053 - Toxic Workplace Communication & Abusive Harassment. Root Cause: Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1048",
+            "title": "Toxic Workplace Communication & Abusive Harassment",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Insider threat driven by employee disgruntlement and possible personal or mental\u2011health issues, leading to hostile verbal threats toward colleagues.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1048 - Toxic Workplace Communication & Abusive Harassment. Root Cause: Insider threat driven by employee disgruntlement and possible personal or mental\u2011health issues, leading to hostile verbal threats toward colleagues.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          },
+          {
+            "id": "INC-2026-1047",
+            "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Insider threat driven by contractor disgruntlement and possible mental\u2011health crisis, leading to hostile statements and intent to cause physical harm.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1047 - Threat to Life & Violent Statement Alert: 'he was killing me'. Root Cause: Insider threat driven by contractor disgruntlement and possible mental\u2011health crisis, leading to hostile statements and intent to cause physical harm.. Resolution: Mitigation verified; zero unauthorized persistence detected."
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": null
+    },
+    {
+      "id": "INC-2026-1053",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:38:51Z",
+      "root_cause": "Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:38:51Z",
+      "resolved_at": "2026-09-28T18:39:17Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Insider Threat - Hostile Language / Violence Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "Automated analysis of Toxic Workplace Communication & Abusive Harassment targeting Microsoft Teams #general & Helpdesk. Cross-referenced with Hindsight organizational memory.",
+        "possible_root_cause": "Direct threat to life, workplace hostility, or malicious insider intent detected in user communications.",
+        "indicators": [
+          "Hostile / harmful statement flagged: 'user submitted toxic profanity, abusive insults, and threats: 'you idi...'",
+          "Originating identity 'hostile_employee@sentinelcorp.internal' on system/channel Microsoft Teams #general & Helpdesk",
+          "Source IP / Location: 10.0.8.44"
+        ],
+        "investigation_steps": [
+          "Preserve complete unedited transcript, chat logs, or email headers for 'hostile_employee@sentinelcorp.internal'",
+          "Verify real-time physical safety of target personnel and secure facility access",
+          "Cross-reference source IP and user badge access logs for physical location tracking",
+          "Notify Corporate Physical Security, HR Employee Relations, and Legal Counsel immediately"
+        ],
+        "recommended_response": [
+          "Immediately restrict digital and physical facility badge access for hostile_employee@sentinelcorp.internal",
+          "Initiate priority workplace safety and threat management escalation protocol",
+          "Preserve all device forensic images and communication history (proven in HIST-001)",
+          "Conduct urgent out-of-band safety check with reported victim"
+        ],
+        "reason_for_recommendation": "Previous incident HIST-001 demonstrated that rapid physical badge suspension and law enforcement/HR escalation mitigated workplace threats immediately.",
+        "historical_evidence": "In historical incident '' (HIST-001), early physical and digital isolation prevented physical harm and insider sabotage.",
+        "prevention_suggestions": [
+          "Implement automated DLP and communication monitoring for threat-to-life keywords",
+          "Provide annual workplace violence prevention and anonymous whistleblower channels",
+          "Integrate HR alerting with physical badge and SSO automated deprovisioning"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1053"
+    },
+    {
+      "id": "INC-2026-1052",
+      "title": "Distributed SSH Brute-Force on Bastion Host",
+      "type": "Brute-Force Attack",
+      "severity": "HIGH",
+      "status": "INVESTIGATING",
+      "description": "Over 38,000 failed SSH authentication attempts detected in 5 minutes targeting root and admin accounts.",
+      "source_ip": "194.26.29.188",
+      "username": "root",
+      "affected_system": "bastion-auth-gateway-02",
+      "additional_logs": "sshd[14920]: Failed password for invalid user admin from 194.26.29.188 port 51230 ssh2\nsshd[14921]: Failed password for root from 194.26.29.188 port 51232 ssh2\nMax retries exceeded; connection dropped by rate limiter.",
+      "timestamp": "2026-09-28T18:35:16Z",
+      "root_cause": null,
+      "investigation_process": null,
+      "actions_taken": null,
+      "successful_resolution": null,
+      "analyst_feedback": null,
+      "lessons_learned": null,
+      "created_at": "2026-09-28T18:35:16Z",
+      "resolved_at": null,
+      "ai_analysis": {
+        "incident_classification": "Credential Access - Automated Brute Force & Password Spraying (T1110)",
+        "severity_assessment": "HIGH",
+        "explanation": "Automated analysis of Distributed SSH Brute-Force on Bastion Host targeting bastion-auth-gateway-02. Cross-referenced with Hindsight organizational memory.",
+        "possible_root_cause": "Directly exposed authentication port with legacy password authentication or unthrottled login endpoint.",
+        "indicators": [
+          "High-frequency failed authentication attempts from source IP 194.26.29.188",
+          "Targeting service account 'root' on bastion-auth-gateway-02",
+          "Absence of progressive exponential backoff on auth endpoint"
+        ],
+        "investigation_steps": [
+          "Inspect SSH/auth logs on bastion-auth-gateway-02 to verify if any login attempts succeeded from 194.26.29.188",
+          "Check GeoIP and Threat Intelligence reputation scores for source IP 194.26.29.188",
+          "Verify if account 'root' has multifactor authentication (MFA) actively enforced",
+          "Audit PAM and firewall fail2ban delay configurations on the target host"
+        ],
+        "recommended_response": [
+          "Block malicious IP 194.26.29.188 at perimeter WAF / Security Group immediately",
+          "Enforce SSH key-only authentication and disable password login on bastion-auth-gateway-02",
+          "Restrict port 22/ingress to internal VPN CIDR (proven in HIST-001)",
+          "Force immediate credential rotation for account 'root'"
+        ],
+        "reason_for_recommendation": "Historical incident HIST-001 demonstrated that restricting ingress to VPN CIDR and disabling password auth eliminated brute-force surface permanently.",
+        "historical_evidence": "In previous incident '' (HIST-001), applying fail2ban and key-only auth resolved the breach with 0 unauthorized access.",
+        "prevention_suggestions": [
+          "Implement automated AWS Config / Cloud Custodian rule to auto-remediate 0.0.0.0/0 on port 22",
+          "Deploy Cloudflare / AWS WAF rate-limiting rule on authentication gateways",
+          "Enforce FIDO2 / hardware MFA for all administrative and service accounts"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": null
+    },
+    {
       "id": "INC-2026-1051",
       "title": "Toxic Workplace Communication & Abusive Harassment",
       "type": "Physical Threat & Hostile Statement",
@@ -510,81 +1471,73 @@
       "created_at": "2026-09-28T17:15:54Z",
       "resolved_at": null,
       "ai_analysis": {
-        "incident_classification": "Unauthorized S3 Data Exfiltration",
+        "incident_classification": "Data-Access Anomaly",
         "severity_assessment": "HIGH",
-        "explanation": "CloudWatch detected a sudden transfer of ~800\u202fGB of compressed database backups from the bucket s3://sentinel-database-backups within 8\u202fminutes. The GetObject events originated from an unrecognized external IP (198.51.100.99) using the CI/CD token (ci-cd-token) as the identity, indicating credential compromise and unauthorized data download.",
-        "possible_root_cause": "Compromised or leaked CI/CD access token (ci-cd-token) that granted S3 GetObject permissions, possibly exposed in a public repository or intercepted via a man\u2011in\u2011the\u2011middle attack.",
+        "explanation": "800\u202fGB of compressed customer database archives were downloaded in 8\u202fminutes from an unrecognized IP, indicating a likely exfiltration attempt.",
+        "possible_root_cause": "A misconfigured firewall rule or bucket policy allowed inbound traffic from 198.51.100.99 to the S3 endpoint without proper authentication checks.",
         "indicators": [
-          "Unusual 800\u202fGB download volume in 8\u202fmin",
-          "Source IP 198.51.100.99 not in trusted CIDR list",
-          "Use of ci-cd-token for S3 GetObject",
-          "UserAgent aws-sdk-go/v1.34 without accompanying CI/CD pipeline activity"
+          "Unusual CloudTrail GetObject spike >50\u202fGB in 8\u202fminutes",
+          "Source IP 198.51.100.99 not in any whitelist",
+          "ci-cd-token role used for bulk download"
         ],
         "investigation_steps": [
-          "Correlate the offending IP with VPC flow logs and firewall logs to confirm external origin",
-          "Inspect IAM policy attached to ci-cd-token for over\u2011privileged S3 permissions",
-          "Review recent code commits and CI/CD pipeline logs for token exposure",
-          "Enable S3 Object Lock and versioning to preserve current objects",
-          "Generate a forensic image of the bucket access logs for timeline reconstruction"
+          "Review CloudTrail logs for all GetObject events and associated IAM role usage",
+          "Cross\u2011check bucket policy, VPC endpoint, and security group rules for 198.51.100.99",
+          "Verify if ci\u2011cd\u2011token role has S3 read permissions and if any policy allows anonymous access"
         ],
         "recommended_response": [
-          "Immediately revoke and rotate the ci-cd-token and any related IAM credentials",
-          "Block source IP 198.51.100.99 at the network perimeter and add to deny list",
-          "Apply a bucket policy that restricts GetObject to trusted VPC endpoints and MFA\u2011authenticated users",
-          "Enable GuardDuty and S3 Access Analyzer for continuous monitoring",
-          "Notify senior management and legal/compliance teams of potential data breach"
+          "Block source IP 198.51.100.99 at firewall and security group",
+          "Revoke ci\u2011cd\u2011token IAM role temporarily and rotate credentials",
+          "Apply stricter bucket policy requiring authenticated access and MFA for privileged roles"
         ],
-        "reason_for_recommendation": "Revoking the compromised token stops further unauthorized reads, while network blocking prevents the attacker from completing the exfiltration. Tightening bucket policies and enabling MFA limits future abuse of any leaked credentials, and continuous monitoring ensures rapid detection of repeat attempts.",
-        "historical_evidence": "In Hindsight memory HIST-001 (similarity 95%) a comparable breach involved a leaked CI/CD token used to download large S3 objects. The incident was resolved by revoking the token, enforcing MFA\u2011required bucket policies, and blocking the attacker IP\u2014actions that fully stopped data loss. Subsequent memories HIST-001 (87% and 79% similarity) reinforced that immediate credential rotation and network isolation were critical to containment, leading to successful resolution each time.",
+        "reason_for_recommendation": "Blocking the offending IP stops further data exfiltration; revoking the role halts ongoing unauthorized access; stricter policy prevents recurrence.",
+        "historical_evidence": "In INC\u20112026\u20111043 a similar spike was caused by a misconfigured firewall rule. The investigation followed steps 1\u20114, and the resolution involved applying a port\u202f22 blocking rule and tightening ingress security groups, which mitigated the attack with zero breach. This precedent confirms the effectiveness of blocking the offending IP and tightening firewall rules.",
         "prevention_suggestions": [
-          "Enforce least\u2011privilege IAM roles and avoid long\u2011lived static tokens",
-          "Store secrets in a dedicated secrets manager with automatic rotation",
-          "Restrict S3 bucket access to specific VPC endpoints and require MFA",
-          "Enable Amazon Macie and GuardDuty for anomalous data access alerts",
-          "Conduct regular token leak scans in public repositories and CI/CD logs"
+          "Enforce immutable ingress security groups for S3 access",
+          "Implement IAM least privilege and enforce MFA for privileged roles"
         ],
         "similar_historical_incidents": [
           {
-            "id": "HIST-001",
-            "title": "",
-            "type": "Cyber Threat",
-            "similarity": "95%",
-            "similarity_score": 0.95,
-            "root_cause": "Historical Root Cause",
-            "investigation_process": "Historical Investigation",
-            "actions_taken": "Mitigation applied",
-            "successful_resolution": "Resolved successfully",
-            "analyst_feedback": "",
-            "lessons_learned": "",
-            "post_mortem_information": ""
+            "id": "INC-2026-1043",
+            "title": "Spike in Unauthenticated S3 Bucket Downloads",
+            "type": "Data-Access Anomaly",
+            "similarity": "98%",
+            "similarity_score": 0.98,
+            "root_cause": "Misconfigured firewall rule",
+            "investigation_process": "1. CloudTrail anomaly alert flagged bulk S3 bucket downloads exceeding 50GB outside business hours.\n2. Inspected IAM role assume-role events and associated IP addresses.\n3. Cross-checked with data owner to verify if download was authorized.\n4. Reviewed DLP logs to inspect sensitive data classifications (PII/PCI).",
+            "actions_taken": "Applied port 22 blocking rule",
+            "successful_resolution": "Attack mitigated with zero breach",
+            "analyst_feedback": "kill kill kill kill kill",
+            "lessons_learned": "Enforce immutable ingress security groups",
+            "post_mortem_information": "Post-Mortem: INC-2026-1043 - Spike in Unauthenticated S3 Bucket Downloads. Root Cause: Misconfigured firewall rule. Resolution: Attack mitigated with zero breach"
           },
           {
-            "id": "HIST-001",
-            "title": "",
-            "type": "Cyber Threat",
-            "similarity": "87%",
-            "similarity_score": 0.87,
-            "root_cause": "Historical Root Cause",
-            "investigation_process": "Historical Investigation",
-            "actions_taken": "Mitigation applied",
-            "successful_resolution": "Resolved successfully",
-            "analyst_feedback": "",
-            "lessons_learned": "",
-            "post_mortem_information": ""
+            "id": "INC-2026-0838",
+            "title": "Severe Threat to Life & Malicious Insider Sabotage Warning",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "66%",
+            "similarity_score": 0.66,
+            "root_cause": "Compromised or rogue privileged insider expressing violent hostility and attempting destructive database wipe.",
+            "investigation_process": "Correlated Slack threat statement with AWS CloudTrail API logs showing unauthorized IAM assume-role commands.",
+            "actions_taken": "Immediately revoked AWS root/admin credentials, revoked IAM roles, severed SSH sessions to production clusters, disabled physical badge access.",
+            "successful_resolution": "Production database safeguarded; backup vaults protected by immutable retention locks; zero data loss.",
+            "analyst_feedback": "Detecting hostile sentiment simultaneously with privileged API calls averted multi-million dollar disaster.",
+            "lessons_learned": "Always enforce AWS multi-party authorization (M-of-N) on destructive database and snapshot operations.",
+            "post_mortem_information": "Post-Mortem: INC-2026-0838 - Severe Threat to Life & Malicious Insider Sabotage Warning. Root Cause: Compromised or rogue privileged insider expressing violent hostility and attempting destructive database wipe.. Resolution: Production database safeguarded; backup vaults protected by immutable retention locks; zero data loss."
           },
           {
-            "id": "HIST-001",
-            "title": "",
-            "type": "Cyber Threat",
-            "similarity": "79%",
-            "similarity_score": 0.79,
-            "root_cause": "Historical Root Cause",
-            "investigation_process": "Historical Investigation",
-            "actions_taken": "Mitigation applied",
-            "successful_resolution": "Resolved successfully",
-            "analyst_feedback": "",
-            "lessons_learned": "",
-            "post_mortem_information": ""
+            "id": "INC-2026-1057",
+            "title": "Threat to Life & Violent Statement Alert: 'he was killing me'",
+            "type": "Physical Threat & Hostile Statement",
+            "similarity": "64%",
+            "similarity_score": 0.64,
+            "root_cause": "Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.",
+            "investigation_process": null,
+            "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+            "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+            "analyst_feedback": "AI recommendation approved by SOC Analyst.",
+            "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+            "post_mortem_information": "Post-Mortem: INC-2026-1057 - Threat to Life & Violent Statement Alert: 'he was killing me'. Root Cause: Insider threat driven by employee disgruntlement and potential mental\u2011health issues, combined with unauthorized access to physical and digital assets.. Resolution: Mitigation verified; zero unauthorized persistence detected."
           }
         ],
         "memory_augmented": true

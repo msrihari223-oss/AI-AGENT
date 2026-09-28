@@ -615,7 +615,18 @@
             e.preventDefault();
             const btn = document.getElementById("analyzeBtn");
             btn.disabled = true;
-            btn.innerHTML = "⏳ Querying Hindsight & AI...";
+            btn.innerHTML = "⏳ AI & Hindsight Investigating...";
+
+            // Instant UI feedback: Show active skeleton loader immediately
+            const resultsBox = document.getElementById("resultsContainer");
+            if (resultsBox) {
+                resultsBox.style.display = "block";
+                resultsBox.scrollIntoView({ behavior: "smooth" });
+                document.getElementById("activeIncidentBadge").textContent = "⚡ Running AI Triage...";
+                document.getElementById("resClassification").textContent = "Analyzing telemetry...";
+                document.getElementById("resExplanation").innerHTML = "<span style='color:var(--accent-cyan);'>🔍 Correlating telemetry across Hindsight persistent memory bank and Groq LLM...</span>";
+                document.getElementById("resRootCause").textContent = "Identifying attack vectors...";
+            }
 
             try {
                 // 1. Create incident record

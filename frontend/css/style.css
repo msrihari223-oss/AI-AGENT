@@ -240,6 +240,7 @@ body::before {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -248,8 +249,22 @@ body::before {
   cursor: pointer;
   border: none;
   text-decoration: none;
-  transition: all var(--transition-fast);
+  transition: transform 0.05s ease, filter 0.05s ease, box-shadow 0.08s ease;
   white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+button, .btn, .scenario-pill, .query-pill, .filter-pill, .btn-xs, a.btn, .copy-btn {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.05s ease, filter 0.05s ease, background 0.08s ease, border-color 0.08s ease !important;
+}
+
+button:active, .btn:active, .scenario-pill:active, .query-pill:active, .filter-pill:active, .btn-xs:active, a.btn:active, .copy-btn:active {
+  transform: scale(0.95) translateY(1px) !important;
+  filter: brightness(1.2) !important;
 }
 
 .btn-primary {
@@ -259,8 +274,8 @@ body::before {
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
+  filter: brightness(1.12);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.5);
 }
 
 .btn-sm {
@@ -276,7 +291,7 @@ body::before {
 
 .btn-outline:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Page Container */

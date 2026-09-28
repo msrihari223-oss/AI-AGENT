@@ -440,14 +440,12 @@
                 if (found) {
                     document.getElementById('incident-picker').value = found.id;
                     loadIncidentIntoStudio(found);
-                    triggerAnalyzeCurrentIncident();
                 }
             } else if (allIncidents.length > 0) {
                 // Default to first open incident
                 const openInc = allIncidents.find(i => i.status !== 'RESOLVED') || allIncidents[0];
                 document.getElementById('incident-picker').value = openInc.id;
                 loadIncidentIntoStudio(openInc);
-                triggerAnalyzeCurrentIncident();
             }
         }
 
@@ -468,20 +466,19 @@
             const inc = allIncidents.find(i => i.id === selectedId);
             if (inc) {
                 loadIncidentIntoStudio(inc);
-                triggerAnalyzeCurrentIncident();
             }
         }
 
         function selectQuickIncident(type) {
             if (type === 'threat') {
                 const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('threat') || (i.title || '').toLowerCase().includes('threat') || (i.description || '').toLowerCase().includes('killing'));
-                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); }
             } else if (type === 'ssh') {
                 const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('brute') || (i.title || '').toLowerCase().includes('ssh'));
-                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); }
             } else if (type === 'exfil') {
                 const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('data') || (i.title || '').toLowerCase().includes('s3'));
-                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); }
             }
         }
 
@@ -517,6 +514,22 @@
                 document.getElementById('res_actions_taken').value = inc.actions_taken || (inc.resolution_details && inc.resolution_details.actions_taken) || '';
                 document.getElementById('res_final_resolution').value = inc.successful_resolution || (inc.resolution_details && inc.resolution_details.final_resolution) || '';
                 document.getElementById('res_lessons_learned').value = inc.lessons_learned || (inc.resolution_details && inc.resolution_details.lessons_learned) || '';
+            }
+
+            // Instantly render existing or preliminary AI analysis (0ms)
+            const resultsGrid = document.getElementById('triage-results-grid');
+            const hitlBar = document.getElementById('hitl-bar');
+            if (resultsGrid && hitlBar) {
+                resultsGrid.style.display = 'grid';
+                hitlBar.style.display = 'flex';
+                if (inc.ai_analysis) {
+                    renderTriageResults({
+                        ai_analysis: inc.ai_analysis,
+                        similar_incidents: inc.ai_analysis.similar_historical_incidents || []
+                    });
+                } else {
+                    simulateAnalysisResults(inc);
+                }
             }
         }
 

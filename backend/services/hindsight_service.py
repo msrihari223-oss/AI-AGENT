@@ -149,10 +149,10 @@ class HindsightService:
         Searches Hindsight memory for similar historical incidents and resolutions.
         Returns the most relevant historical incidents with similarity confidence scores.
         """
-        # 1. Try Hindsight Cloud Recall
+        # 1. Try Hindsight Cloud Recall with fast timeout
         if self.api_key:
             try:
-                async with httpx.AsyncClient(timeout=3.5) as client:
+                async with httpx.AsyncClient(timeout=1.2) as client:
                     response = await client.post(
                         f"{self.api_url}/v1/default/banks/{self.bank_id}/memories/recall",
                         headers={
@@ -176,8 +176,7 @@ class HindsightService:
                             if results:
                                 return results
             except Exception as e:
-                print(f"Hindsight recall connection notice: {e}")
-                print(f"Hindsight recall connection notice: {e}")
+                pass
 
         # 2. Local Semantic & Lexical Recall over persistent incident store
         return self._local_search(query, incident_type, limit)
