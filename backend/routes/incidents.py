@@ -167,8 +167,6 @@ async def store_memory_endpoint(req: MemoryStoreRequest):
         analyst_feedback=req.analyst_feedback
     )
     return result
-<<<<<<< HEAD
-
 @router.post("/sync/supabase")
 async def sync_supabase_endpoint():
     """Sync all local incidents to Supabase cloud table editor"""
@@ -178,5 +176,3 @@ async def sync_supabase_endpoint():
     result = await supabase_service.sync_all_incidents(incidents)
     return result
 
-=======
->>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0

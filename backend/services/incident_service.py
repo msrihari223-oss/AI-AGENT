@@ -19,25 +19,17 @@ DATA_FILE = Path(__file__).resolve().parent.parent.parent / "data" / "incidents.
 class IncidentService:
     def __init__(self, data_path: Path = DATA_FILE):
         self.data_path = data_path
-<<<<<<< HEAD
         self._cache: Optional[List[Dict[str, Any]]] = None
         init_db()
 
     def _invalidate_cache(self):
         self._cache = None
 
-=======
-        init_db()
-
->>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
     def _sync_to_json(self):
         """Maintains a synchronized JSON backup of all SQLite records."""
         try:
             incidents = db_get_all()
-<<<<<<< HEAD
             self._cache = incidents
-=======
->>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
             self.data_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.data_path, "w", encoding="utf-8") as f:
                 json.dump({"incidents": incidents}, f, indent=2)
@@ -45,7 +37,6 @@ class IncidentService:
             print(f"[!] Warning syncing SQLite to JSON: {e}")
 
     def get_all(self, status: Optional[str] = None, severity: Optional[str] = None) -> List[IncidentResponse]:
-<<<<<<< HEAD
         if self._cache is None:
             self._cache = db_get_all()
         incidents = self._cache
@@ -63,12 +54,6 @@ class IncidentService:
             for inc in self._cache:
                 if inc.get("id") == incident_id:
                     return IncidentResponse(**inc)
-=======
-        incidents = db_get_all(status=status, severity=severity)
-        return [IncidentResponse(**inc) for inc in incidents]
-
-    def get_by_id(self, incident_id: str) -> Optional[IncidentResponse]:
->>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
         inc = db_get_by_id(incident_id)
         if inc:
             return IncidentResponse(**inc)

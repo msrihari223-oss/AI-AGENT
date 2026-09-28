@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# AI-AGENT
-=======
 # ⚡ INCIDENT RESPONSE AGENT
 ### *AI-Powered Cybersecurity Incident Response Agent with Hindsight Persistent Memory*
 
