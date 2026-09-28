@@ -1,6 +1,292 @@
 {
   "incidents": [
     {
+      "id": "INC-2026-1064",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "INVESTIGATING",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:54:28Z",
+      "root_cause": null,
+      "investigation_process": null,
+      "actions_taken": null,
+      "successful_resolution": null,
+      "analyst_feedback": null,
+      "lessons_learned": null,
+      "created_at": "2026-09-28T18:54:28Z",
+      "resolved_at": null,
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User hostile_employee@sentinelcorp.internal posted profanity and explicit threats in Microsoft Teams #general and Helpdesk, triggering a high\u2011severity DLP alert for toxic harassment and verbal threats.",
+        "possible_root_cause": "Workplace harassment stemming from personal conflict or unresolved grievance, amplified by lack of immediate moderation and insufficient escalation protocols.",
+        "indicators": [
+          "Profanity and abusive insults detected by DLP",
+          "Verbal threat language: \"I will ruin you and make you pay\"",
+          "High\u2011severity Teams DLP alert",
+          "Source IP 10.0.8.44 linked to user account"
+        ],
+        "investigation_steps": [
+          "Isolate the user\u2019s Teams session and terminate all active connections",
+          "Collect and preserve chat logs, metadata, and DLP alert details",
+          "Notify HR and Security Incident Response Team",
+          "Cross\u2011reference user\u2019s badge and access logs for potential physical access",
+          "Document all findings in the incident ticket"
+        ],
+        "recommended_response": [
+          "Revoke the user\u2019s physical badge and access rights",
+          "Terminate the user\u2019s Teams session and any other active digital sessions",
+          "Notify on\u2011site physical security to monitor the user\u2019s movements",
+          "Escalate to HR for disciplinary action and potential legal review",
+          "Preserve all evidence (chat logs, DLP alerts, IP logs) for forensic analysis"
+        ],
+        "reason_for_recommendation": "The presence of explicit threats and profanity warrants immediate containment to protect staff safety and prevent escalation. Rapid badge revocation and session termination mitigate both digital and physical risk, while evidence preservation supports any subsequent legal or disciplinary actions.",
+        "historical_evidence": "All three retrieved Hindsight memories (HIST-001) involved high\u2011severity harassment incidents with similar threat language. In each case, the response team revoked the offender\u2019s badge, terminated their digital session, notified physical security, and preserved evidence, leading to successful resolution and no further incidents. These actions were consistently cited as effective mitigation steps, providing high confidence in the recommended response.",
+        "prevention_suggestions": [
+          "Enforce a zero\u2011tolerance harassment policy with automated DLP monitoring for threat language",
+          "Conduct regular harassment and workplace safety training for all employees"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": null
+    },
+    {
+      "id": "INC-2026-1063",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:53:31Z",
+      "root_cause": "Hostile communications and verified physical safety threat vector.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:53:31Z",
+      "resolved_at": "2026-09-28T18:54:15Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "User hostile_employee@sentinelcorp.internal used profanity and direct threats in Microsoft Teams #general and Helpdesk, stating \"you idiot bastard, I will ruin you and make you pay\". The content was flagged by Teams DLP as high\u2011severity toxic harassment.",
+        "possible_root_cause": "Employee dissatisfaction or workplace conflict leading to hostile communication and intent to intimidate or harm a colleague.",
+        "indicators": [
+          "Profanity and abusive insults detected in Teams chat",
+          "Explicit threat statement: \"I will ruin you and make you pay\"",
+          "High\u2011severity DLP alert from Microsoft Teams"
+        ],
+        "investigation_steps": [
+          "Immediately isolate the user session and revoke access to Teams and Helpdesk",
+          "Collect all chat logs, metadata, and IP information (10.0.8.44) for forensic analysis"
+        ],
+        "recommended_response": [
+          "Revoke badge and terminate digital session immediately",
+          "Notify physical security and HR for threat assessment and potential protective measures"
+        ],
+        "reason_for_recommendation": "The presence of violent language and direct threats necessitates urgent containment to protect personnel and prevent escalation.",
+        "historical_evidence": "Historical incidents (HIST-001) with 95%, 87%, and 79% similarity showed that rapid badge revocation, session termination, and coordinated notification to security and HR led to successful resolution and prevented further harm. These cases confirm the effectiveness of the recommended containment actions.",
+        "prevention_suggestions": [
+          "Implement real\u2011time content filtering and escalation protocols for toxic language",
+          "Conduct regular employee training on harassment policies and reporting procedures"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1063"
+    },
+    {
+      "id": "INC-2026-1062",
+      "title": "Toxic Workplace Communication & Abusive Harassment",
+      "type": "Physical Threat & Hostile Statement",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "description": "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+      "source_ip": "10.0.8.44",
+      "username": "hostile_employee@sentinelcorp.internal",
+      "affected_system": "Microsoft Teams #general & Helpdesk",
+      "additional_logs": "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected.",
+      "timestamp": "2026-09-28T18:48:40Z",
+      "root_cause": "Employee engaged in workplace harassment and intimidation, possibly due to unresolved conflict or personal grievance.",
+      "investigation_process": null,
+      "actions_taken": "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.",
+      "successful_resolution": "Mitigation verified; zero unauthorized persistence detected.",
+      "analyst_feedback": "",
+      "lessons_learned": "Enforce key-only authentication with continuous port exposure monitoring.",
+      "created_at": "2026-09-28T18:48:40Z",
+      "resolved_at": "2026-09-28T18:50:16Z",
+      "ai_analysis": {
+        "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
+        "severity_assessment": "HIGH",
+        "explanation": "The user \"hostile_employee@sentinelcorp.internal\" used profanity and explicit threats in Microsoft Teams, triggering a high\u2011severity DLP alert. The language indicates potential intent to cause physical harm or intimidation, warranting immediate containment.",
+        "possible_root_cause": "Employee engaged in workplace harassment and intimidation, possibly due to unresolved conflict or personal grievance.",
+        "indicators": [
+          "Profanity and abusive insults",
+          "Explicit threat language: \"I will ruin you and make you pay\""
+        ],
+        "investigation_steps": [
+          "Isolate the user\u2019s session and revoke access to Teams and Helpdesk",
+          "Collect all chat logs, metadata, and device information for forensic analysis",
+          "Notify HR and Security Incident Response Team",
+          "Engage physical security to monitor the employee\u2019s movements"
+        ],
+        "recommended_response": [
+          "Revoke the employee\u2019s badge and access credentials",
+          "Terminate the user\u2019s digital session immediately",
+          "Notify physical security to monitor the employee and ensure workplace safety",
+          "Preserve all evidence (chat logs, IP logs, device data) for legal and investigative purposes"
+        ],
+        "reason_for_recommendation": "The threat language indicates a high risk of physical harm or intimidation. Immediate containment protects staff and preserves evidence for potential legal action.",
+        "historical_evidence": "In HIST-001, a similar incident involving profanity and threats was detected. The response team revoked the user\u2019s badge, terminated the session, notified physical security, and preserved evidence. These actions led to a successful resolution with no harm reported. The high similarity scores (0.95, 0.87, 0.79) confirm that the same containment strategy is effective.",
+        "prevention_suggestions": [
+          "Implement mandatory harassment and workplace safety training for all employees",
+          "Deploy continuous monitoring and automated DLP alerts for profanity and threat language"
+        ],
+        "similar_historical_incidents": [
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "95%",
+            "similarity_score": 0.95,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "87%",
+            "similarity_score": 0.87,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          },
+          {
+            "id": "HIST-001",
+            "title": "",
+            "type": "Cyber Threat",
+            "similarity": "79%",
+            "similarity_score": 0.79,
+            "root_cause": "Historical Root Cause",
+            "investigation_process": "Historical Investigation",
+            "actions_taken": "Mitigation applied",
+            "successful_resolution": "Resolved successfully",
+            "analyst_feedback": "",
+            "lessons_learned": "",
+            "post_mortem_information": ""
+          }
+        ],
+        "memory_augmented": true
+      },
+      "hindsight_memory_id": "hs-INC-2026-1062"
+    },
+    {
       "id": "INC-2026-1061",
       "title": "Toxic Workplace Communication & Abusive Harassment",
       "type": "Physical Threat & Hostile Statement",
@@ -599,30 +885,31 @@
       "ai_analysis": {
         "incident_classification": "Physical Safety & Hostile Statement / Threat Alert",
         "severity_assessment": "HIGH",
-        "explanation": "User hostile_employee@sentinelcorp.internal posted profanity and threats in Microsoft Teams #general and Helpdesk, detected by DLP monitor.",
-        "possible_root_cause": "Disgruntled employee with workplace conflict, possibly triggered by recent performance review or interpersonal dispute.",
+        "explanation": "User used profanity and threats in Microsoft Teams, indicating a potential physical threat to staff.",
+        "possible_root_cause": "Employee dissatisfaction or workplace conflict leading to hostile communication.",
         "indicators": [
-          "Profanity detected in Teams messages",
-          "Verbal threat phrase 'I will ruin you and make you pay'",
-          "High\u2011severity DLP alert"
+          "Profanity detected",
+          "Verbal threat phrase",
+          "High severity DLP alert"
         ],
         "investigation_steps": [
-          "Collect Teams chat logs, timestamps, and metadata",
-          "Verify user identity and access logs",
-          "Notify HR, IT security, and physical security",
-          "Preserve evidence for legal review"
+          "Collect chat logs and metadata",
+          "Verify user identity and badge status",
+          "Notify physical security",
+          "Isolate user session",
+          "Preserve evidence"
         ],
         "recommended_response": [
-          "Terminate user's session and revoke all access badges",
-          "Notify physical security and law enforcement if threat escalates",
-          "Preserve all chat logs and device data for forensic analysis",
-          "Notify affected employees and provide support resources"
+          "Revoke employee badge and access",
+          "Terminate digital session immediately",
+          "Notify local law enforcement if warranted",
+          "Document incident and notify HR"
         ],
-        "reason_for_recommendation": "Immediate containment prevents potential escalation to physical harm; evidence preservation supports legal action and internal investigation.",
-        "historical_evidence": "All three Hindsight memories (HIST-001) involved similar abusive language and threats. In each case, mitigation actions included revoking access, terminating sessions, and preserving evidence, which led to successful resolution and no further incidents.",
+        "reason_for_recommendation": "Immediate containment reduces risk of escalation and protects staff safety.",
+        "historical_evidence": "Similar incidents (HIST-001) with 95% similarity were mitigated by revoking access, terminating sessions, and involving security, leading to successful resolution.",
         "prevention_suggestions": [
-          "Implement stricter DLP policies and real\u2011time monitoring of harassment content",
-          "Conduct regular employee training on harassment, reporting procedures, and digital communication standards"
+          "Implement real-time harassment monitoring",
+          "Provide employee training on workplace conduct"
         ],
         "similar_historical_incidents": [
           {

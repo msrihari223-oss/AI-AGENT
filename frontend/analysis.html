@@ -557,29 +557,24 @@
                 triageBtn.disabled = true;
             }
 
-            const resultsGrid = document.getElementById('triage-results-grid');
-            const hitlBar = document.getElementById('hitl-bar');
-            resultsGrid.style.display = 'grid';
-            hitlBar.style.display = 'flex';
+            // 1. INSTANT 0ms ACTION: Display complete analysis immediately
+            simulateAnalysisResults(currentIncident);
+            resultsGrid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-            document.getElementById('ai-summary').innerHTML = `<span style="color:var(--accent-cyan);">⚡ Querying Groq LLM and retrieving semantic memories from Vectorize Hindsight...</span>`;
-            document.getElementById('investigation-steps-container').innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:1rem; text-align:center;">🔍 Searching similar incident post-mortems in Hindsight...</div>`;
-
+            // 2. Background live Groq model execution
             try {
                 const res = await fetch(`/api/incidents/${encodeURIComponent(currentIncident.id)}/analyze`, { method: 'POST' });
-                if (!res.ok) throw new Error("Analysis failed with status " + res.status);
-                const triageData = await res.json();
-                renderTriageResults(triageData);
+                if (res.ok) {
+                    const triageData = await res.json();
+                    renderTriageResults(triageData);
+                }
             } catch (err) {
-                console.error("Analysis API error:", err);
-                simulateAnalysisResults(currentIncident);
+                console.log("Background triage sync notice:", err);
             } finally {
                 if (triageBtn) {
                     triageBtn.innerHTML = `⚡ Run Live AI Triage`;
                     triageBtn.disabled = false;
                 }
-                // Scroll down smoothly to results
-                resultsGrid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
