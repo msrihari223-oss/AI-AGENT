@@ -51,6 +51,7 @@ def init_db():
         """)
         
         cursor.execute("""
+<<<<<<< HEAD
             CREATE TABLE IF NOT EXISTS "M SRI HARI SAI ESWAR" (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -77,6 +78,8 @@ def init_db():
         """)
         
         cursor.execute("""
+=======
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
             CREATE TABLE IF NOT EXISTS audit_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 incident_id TEXT,
@@ -105,7 +108,19 @@ def init_db():
 def insert_incident_row(cursor: sqlite3.Cursor, inc: Dict[str, Any]):
     """Helper to insert an incident dict into SQLite."""
     ai_str = json.dumps(inc.get("ai_analysis")) if isinstance(inc.get("ai_analysis"), dict) else inc.get("ai_analysis")
+<<<<<<< HEAD
     params = (
+=======
+    cursor.execute("""
+        INSERT OR REPLACE INTO incidents (
+            id, title, type, severity, status, description, source_ip, username,
+            affected_system, additional_logs, timestamp, root_cause,
+            investigation_process, actions_taken, successful_resolution,
+            analyst_feedback, lessons_learned, created_at, resolved_at,
+            ai_analysis, hindsight_memory_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
         inc.get("id"),
         inc.get("title"),
         inc.get("type"),
@@ -127,6 +142,7 @@ def insert_incident_row(cursor: sqlite3.Cursor, inc: Dict[str, Any]):
         inc.get("resolved_at"),
         ai_str,
         inc.get("hindsight_memory_id")
+<<<<<<< HEAD
     )
     cursor.execute("""
         INSERT OR REPLACE INTO incidents (
@@ -146,6 +162,9 @@ def insert_incident_row(cursor: sqlite3.Cursor, inc: Dict[str, Any]):
             ai_analysis, hindsight_memory_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, params)
+=======
+    ))
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
 
 def row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
     """Converts a SQLite row into an incident dictionary."""

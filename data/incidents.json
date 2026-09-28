@@ -1,6 +1,7 @@
 {
   "incidents": [
     {
+<<<<<<< HEAD
       "id": "INC-2026-1049",
       "title": "Distributed SSH Brute-Force on Bastion Host",
       "type": "Brute-Force Attack",
@@ -299,6 +300,8 @@
       "hindsight_memory_id": "hs-INC-2026-1047"
     },
     {
+=======
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
       "id": "INC-2026-1046",
       "title": "Spike in Unauthenticated S3 Bucket Downloads",
       "type": "Data-Access Anomaly",
@@ -321,6 +324,7 @@
       "ai_analysis": {
         "incident_classification": "Unauthorized S3 Data Exfiltration",
         "severity_assessment": "HIGH",
+<<<<<<< HEAD
         "explanation": "CloudWatch detected a sudden transfer of ~800\u202fGB of compressed database backups from the bucket s3://sentinel-database-backups within 8\u202fminutes. The GetObject events originated from an unrecognized external IP (198.51.100.99) using the CI/CD token (ci-cd-token) as the identity, indicating credential compromise and unauthorized data download.",
         "possible_root_cause": "Compromised or leaked CI/CD access token (ci-cd-token) that granted S3 GetObject permissions, possibly exposed in a public repository or intercepted via a man\u2011in\u2011the\u2011middle attack.",
         "indicators": [
@@ -351,6 +355,40 @@
           "Restrict S3 bucket access to specific VPC endpoints and require MFA",
           "Enable Amazon Macie and GuardDuty for anomalous data access alerts",
           "Conduct regular token leak scans in public repositories and CI/CD logs"
+=======
+        "explanation": "CloudWatch detected 800\u202fGB of compressed database archives downloaded from the sentinel-database-backups bucket within 8\u202fminutes. The GetObject events originated from an unrecognized IP (198.51.100.99) using the ci\u2011cd\u2011token credential, indicating a credential compromise and large\u2011scale data exfiltration.",
+        "possible_root_cause": "Compromised CI/CD token (ci-cd-token) possibly leaked or harvested, allowing an external attacker to access the S3 bucket.",
+        "indicators": [
+          "Unrecognized source IP 198.51.100.99",
+          "Massive GetObject calls within minutes",
+          "Use of ci\u2011cd\u2011token user agent aws-sdk-go/v1.34",
+          "800\u202fGB of data transferred"
+        ],
+        "investigation_steps": [
+          "Correlate CloudTrail logs for the token across all services",
+          "Validate the token\u2019s creation time and associated IAM role",
+          "Block the offending IP at the VPC/network level",
+          "Revoke and rotate the ci\u2011cd\u2011token immediately",
+          "Inspect recent CI/CD pipeline commits for secret exposure",
+          "Enable S3 Object Lock and versioning on the bucket",
+          "Review bucket policy for public access or overly permissive statements"
+        ],
+        "recommended_response": [
+          "Revoke the compromised ci\u2011cd\u2011token and generate a new short\u2011lived token",
+          "Block source IP 198.51.100.99 via security groups/NACLs",
+          "Apply a restrictive bucket policy limiting access to trusted VPC endpoints and MFA\u2011protected IAM roles",
+          "Initiate full data loss investigation and notify the incident response team",
+          "Preserve all CloudTrail and VPC flow logs for forensic analysis"
+        ],
+        "reason_for_recommendation": "Revoking the stolen credential and blocking the attacker\u2019s IP stop further data exfiltration, while tightening bucket policies prevents reuse of any leaked tokens and limits future exposure.",
+        "historical_evidence": "In Hindsight memory HIST-001 (similarity 95%) a comparable breach involved a leaked CI/CD token used to download large S3 objects. The incident was resolved by revoking the token, tightening bucket policies, and blocking the attacker\u2019s IP, which halted data loss. The same actions were successful in HIST-001 entries with 87% and 79% similarity, reinforcing confidence in this response.",
+        "prevention_suggestions": [
+          "Implement least\u2011privilege IAM roles and short\u2011lived tokens for CI/CD pipelines",
+          "Enforce secret scanning in code repositories and rotate credentials regularly",
+          "Enable S3 Block Public Access, VPC endpoints, and MFA\u2011required API calls",
+          "Activate detailed CloudTrail data events for S3 and set up anomaly detection alerts",
+          "Conduct regular penetration testing and credential exposure drills"
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
         ],
         "similar_historical_incidents": [
           {
@@ -824,6 +862,7 @@
       "investigation_process": "1. Analyzed auth.log telemetry and identified 1,420 failed SSH attempts within a 4-minute window.\n2. Traced source IP 192.168.1.105 via GeoIP intelligence to an unauthorized external proxy.\n3. Verified bastion host session logs to confirm whether any login attempt succeeded.\n4. Checked endpoint memory artifacts and PAM authentication daemon configuration.",
       "actions_taken": "Blocked IP 1.2.3.4 at WAF, rotated admin keys, disabled password auth",
       "successful_resolution": "Access secured; zero unauthorized persistence confirmed",
+<<<<<<< HEAD
       "analyst_feedback": "",
       "lessons_learned": "Automate port 22 exposure scans in CI/CD pipeline",
       "created_at": "2026-09-28T13:57:28Z",
@@ -901,6 +940,14 @@
         "memory_augmented": true
       },
       "hindsight_memory_id": "hs-INC-2026-1040"
+=======
+      "analyst_feedback": "AI recommendation was 100% accurate",
+      "lessons_learned": "Automate port 22 exposure scans in CI/CD pipeline",
+      "created_at": "2026-09-28T13:57:28Z",
+      "resolved_at": "2026-09-28T13:57:29Z",
+      "ai_analysis": null,
+      "hindsight_memory_id": "hs-bank-INC-2026-1040"
+>>>>>>> 9e33a6993227b8a707af8d7479c82e38245810a0
     },
     {
       "id": "INC-2026-1039",
