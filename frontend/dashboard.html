@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Command Center | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js for High-Tech SOC Incident Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item active"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>🛡️</span> Security Operations Center (SOC) Command Dashboard</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/incident.html" class="btn btn-primary">+ New Incident</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- 6 Key SOC Metrics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Incidents</div>
+                    <div class="stat-value" id="stat-total">--</div>
+                    <div class="stat-sub">Across all environments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Open Incidents</div>
+                    <div class="stat-value" style="color:var(--accent-cyan);" id="stat-open">--</div>
+                    <div class="stat-sub">Active triage required</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Resolved Incidents</div>
+                    <div class="stat-value" style="color:var(--accent-emerald);" id="stat-resolved">--</div>
+                    <div class="stat-sub">Saved to Hindsight memory</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">High Severity</div>
+                    <div class="stat-value" style="color:var(--accent-rose);" id="stat-high">--</div>
+                    <div class="stat-sub">Critical threat level</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Medium Severity</div>
+                    <div class="stat-value" style="color:var(--accent-amber);" id="stat-medium">--</div>
+                    <div class="stat-sub">Elevated priority</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Low Severity</div>
+                    <div class="stat-value" style="color:var(--accent-emerald);" id="stat-low">--</div>
+                    <div class="stat-sub">Routine investigation</div>
+                </div>
+            </div>
+
+            <!-- Incident Trend Chart & Categories Distribution -->
+            <div class="dashboard-grid-2">
+                <!-- Trend Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📈 Incident Activity & Threat Trend (7-Day)</h2>
+                        <span class="badge badge-open">Real-time Telemetry</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="incidentTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Threat Categories Breakdown -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🎯 Attack / Incident Categories</h2>
+                        <span class="badge badge-resolved">MITRE Aligned</span>
+                    </div>
+                    <div class="category-list" id="category-distribution-container">
+                        <div style="color:var(--text-muted); font-size:0.85rem;">Loading categories...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Incidents Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🚨 Recent Security Incidents</h2>
+                    <span class="badge badge-open">Live Incident Log</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="soc-table">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Title & Summary</th>
+                                <th>Category</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Target System</th>
+                                <th>Detected At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-incidents-table-body">
+                            <tr>
+                                <td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">
+                                    Loading live incidents...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

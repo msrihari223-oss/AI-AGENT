@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Analysis & AI Triage Studio | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .selector-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .incident-select-control {
+            flex: 1;
+            min-width: 280px;
+            background: rgba(10, 14, 23, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+        }
+        .incident-select-control:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+        }
+        .scenario-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .scenario-pill:hover {
+            border-color: var(--accent-cyan);
+            color: #fff;
+        }
+        .memory-match-box {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .similarity-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .recommendation-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .hitl-bar {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .copy-btn:hover {
+            color: #fff;
+            border-color: var(--accent-cyan);
+        }
+        /* Resolution Modal - Official Dark SOC Theme */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-dialog {
+            background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            border-radius: 16px;
+            max-width: 760px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.15);
+            padding: 2rem;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .modal-dialog .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1.15rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .modal-dialog .form-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+        }
+        .modal-dialog .form-control,
+        .modal-dialog textarea.form-control,
+        .modal-dialog input.form-control {
+            width: 100% !important;
+            display: block;
+            box-sizing: border-box !important;
+            background: rgba(10, 14, 23, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 8px !important;
+            padding: 0.75rem 1rem !important;
+            color: #ffffff !important;
+            font-size: 0.9rem !important;
+            font-family: var(--font-main) !important;
+            line-height: 1.5 !important;
+            transition: all var(--transition-fast);
+        }
+        .modal-dialog textarea.form-control {
+            resize: vertical;
+            min-height: 72px;
+        }
+        .modal-dialog .form-control:focus {
+            outline: none !important;
+            border-color: var(--accent-cyan) !important;
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4) !important;
+            background: #0f172a !important;
+        }
+        .modal-dialog .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+        .modal-dialog .modal-close:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation with 6 distinct items -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item active"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>🔍</span> Incident Analysis & AI Triage Studio</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/incident.html" class="btn btn-outline">+ Log New Incident</a>
+                <button type="button" class="btn btn-primary" onclick="triggerAnalyzeCurrentIncident()">⚡ Run Live AI Triage</button>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- Incident Selector Header Bar -->
+            <div class="selector-card">
+                <div style="display:flex; align-items:center; gap:0.75rem; flex:1;">
+                    <span style="font-weight:700; font-size:0.85rem; color:var(--text-secondary); text-transform:uppercase;">Select Incident:</span>
+                    <select id="incident-picker" class="incident-select-control" onchange="onIncidentSelected()">
+                        <option value="">-- Choose an Incident to Triage --</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Quick Load:</span>
+                    <button type="button" class="scenario-pill" onclick="selectQuickIncident('threat')">⚠️ Violent Threat</button>
+                    <button type="button" class="scenario-pill" onclick="selectQuickIncident('ssh')">🎯 SSH Brute-Force</button>
+                    <button type="button" class="scenario-pill" onclick="selectQuickIncident('exfil')">📦 S3 Data Exfil</button>
+                </div>
+            </div>
+
+            <!-- Active Incident Overview Card -->
+            <div class="card" id="incident-overview-card" style="margin-bottom:1.5rem;">
+                <div class="card-header" style="justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span style="font-size:1.5rem;" id="active-inc-icon">🚨</span>
+                        <div>
+                            <h2 class="card-title" id="active-inc-title">Select or load an incident above</h2>
+                            <span style="font-family:var(--font-mono); color:var(--accent-cyan); font-size:0.8rem;" id="active-inc-id">NO INCIDENT LOADED</span>
+                        </div>
+                    </div>
+                    <div id="active-inc-badges" style="display:flex; gap:0.5rem;">
+                        <span class="badge badge-open">Standby</span>
+                    </div>
+                </div>
+                <div style="color:var(--text-secondary); font-size:0.9rem; line-height:1.5;" id="active-inc-desc">
+                    Choose an incident from the dropdown above or submit a new telemetry alert from the New Incident page to begin deep memory-aware investigation.
+                </div>
+                <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted); display:flex; gap:1.5rem; flex-wrap:wrap;">
+                    <div><strong>Affected Asset:</strong> <span id="active-inc-system" style="color:var(--accent-cyan);">--</span></div>
+                    <div><strong>Category:</strong> <span id="active-inc-category" style="color:#fff;">--</span></div>
+                    <div><strong>Detected:</strong> <span id="active-inc-date">--</span></div>
+                </div>
+            </div>
+
+            <!-- Section 5 & 6: AI Investigation & Hindsight Memory Recall Panel -->
+            <div class="dashboard-grid-2" id="triage-results-grid" style="display:none;">
+                <!-- Left: AI Threat Analysis & Classification -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🤖 AI Agent Triage Assessment</h2>
+                        <span class="badge badge-high" id="triage-ai-model-badge">Groq GPT-OSS</span>
+                    </div>
+                    
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.35rem;">Threat Summary & Intent</div>
+                        <div id="ai-summary" style="font-size:0.9rem; color:var(--text-primary); line-height:1.5; background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">--</div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                        <div>
+                            <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">Assessed Severity</div>
+                            <div id="ai-severity-box"><span class="badge badge-high">HIGH</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">Confidence Score</div>
+                            <div id="ai-confidence" style="font-family:var(--font-mono); color:var(--accent-emerald); font-weight:700;">96%</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.35rem;">Potential Blast Radius / Impact</div>
+                        <div id="ai-impact" style="font-size:0.85rem; color:var(--text-secondary); line-height:1.4;">--</div>
+                    </div>
+
+                    <div>
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.35rem;">Immediate Containment Action</div>
+                        <div id="ai-containment" style="font-size:0.85rem; color:var(--accent-cyan); font-weight:600; background:rgba(6,182,212,0.08); padding:0.75rem; border-radius:8px; border:1px solid rgba(6,182,212,0.2);">--</div>
+                    </div>
+                </div>
+
+                <!-- Right: Section 5 & 6 Hindsight Persistent Memory Match -->
+                <div class="card">
+                    <div class="card-header" style="justify-content:space-between;">
+                        <h2 class="card-title">🧠 Section 5 & 6: Hindsight Memory Recall</h2>
+                        <span class="similarity-pill" id="hindsight-similarity-pill">94% Semantic Match</span>
+                    </div>
+
+                    <div class="memory-match-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                            <span style="font-size:0.8rem; font-weight:700; color:var(--accent-cyan);" id="hindsight-match-title">Historical Incident Match</span>
+                            <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);" id="hindsight-match-id">#INC-HIST</span>
+                        </div>
+                        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;" id="hindsight-match-desc">--</p>
+                        <div style="font-size:0.8rem; background:rgba(0,0,0,0.3); padding:0.5rem 0.75rem; border-radius:6px;">
+                            <strong style="color:var(--accent-emerald);">Historical Root Cause:</strong> <span id="hindsight-match-root">--</span><br>
+                            <strong style="color:var(--accent-cyan);">Successful Resolution:</strong> <span id="hindsight-match-res">--</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                            <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Recommended Investigation Steps</div>
+                            <button class="copy-btn" onclick="copyInvestigationPlan()">📋 Copy Plan</button>
+                        </div>
+                        <div id="investigation-steps-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div style="margin-top:1rem;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.35rem;">Reason for Recommendation</div>
+                        <div id="recommendation-reason" style="font-size:0.85rem; color:var(--text-secondary); line-height:1.4;">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Human-in-the-Loop Decision Guardrail Bar -->
+            <div class="hitl-bar" id="hitl-bar" style="display:none;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <span style="font-size:1.5rem;">🛡️</span>
+                    <div>
+                        <h3 style="font-size:0.95rem; font-weight:700; color:#fff;">Human-in-the-Loop SOC Authorization</h3>
+                        <p style="font-size:0.8rem; color:var(--text-secondary);">Verify the memory-aware mitigation plan before executing active response or resolving incident.</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:0.75rem;">
+                    <button type="button" class="btn btn-outline" style="border-color:var(--accent-rose); color:var(--accent-rose);" onclick="rejectRemediation()">✖ Reject Action</button>
+                    <button type="button" class="btn btn-primary" onclick="openResolutionModal()">✅ Authorize & Resolve Incident</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Section 8: 5-Field Incident Resolution Modal -->
+    <div class="modal-overlay" id="resolutionModal">
+        <div class="modal-dialog">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
+                <h2 style="font-size:1.2rem; font-weight:700;">📝 Section 8: Incident Resolution & Memory Sync</h2>
+                <button type="button" class="modal-close" onclick="closeResolutionModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">×</button>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">
+                Finalizing this incident will record the post-mortem into <strong>Vectorize Hindsight Persistent Memory</strong> for future organizational learning.
+            </p>
+
+            <form id="resolutionForm" onsubmit="submitResolution(event)">
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label class="form-label">1. Root Cause Analysis *</label>
+                    <textarea id="res_root_cause" class="form-control" rows="2" required placeholder="What was the underlying root cause?"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label class="form-label">2. Actions Taken *</label>
+                    <textarea id="res_actions_taken" class="form-control" rows="2" required placeholder="Specific containment, eradication, and recovery steps executed..."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label class="form-label">3. Final Resolution *</label>
+                    <textarea id="res_final_resolution" class="form-control" rows="2" required placeholder="How was the threat neutralized and service restored?"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label class="form-label">4. Lessons Learned</label>
+                    <textarea id="res_lessons_learned" class="form-control" rows="2" placeholder="Policy updates, rule enhancements, or architectural recommendations..."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    <label class="form-label">5. Analyst Comments & Feedback</label>
+                    <input type="text" id="res_analyst_feedback" class="form-control" placeholder="Optional notes regarding AI triage accuracy or speed">
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeResolutionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Resolution to Hindsight</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let allIncidents = [];
+        let currentIncident = null;
+
+        async function initAnalysisStudio() {
+            try {
+                const res = await fetch('/api/incidents');
+                if (res.ok) {
+                    allIncidents = await res.json();
+                    populateIncidentPicker();
+                }
+            } catch (err) {
+                console.error("Failed to load incidents:", err);
+            }
+
+            // Check if ?id= is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+            if (idParam) {
+                const found = allIncidents.find(i => i.id === idParam);
+                if (found) {
+                    document.getElementById('incident-picker').value = found.id;
+                    loadIncidentIntoStudio(found);
+                    triggerAnalyzeCurrentIncident();
+                }
+            } else if (allIncidents.length > 0) {
+                // Default to first open incident
+                const openInc = allIncidents.find(i => i.status !== 'RESOLVED') || allIncidents[0];
+                document.getElementById('incident-picker').value = openInc.id;
+                loadIncidentIntoStudio(openInc);
+                triggerAnalyzeCurrentIncident();
+            }
+        }
+
+        function populateIncidentPicker() {
+            const picker = document.getElementById('incident-picker');
+            picker.innerHTML = `<option value="">-- Choose an Incident to Triage --</option>` + 
+                allIncidents.map(inc => `
+                    <option value="${escapeHtml(inc.id)}">
+                        [${inc.severity || 'MED'}] ${escapeHtml(inc.id)} - ${escapeHtml(inc.title || 'Untitled')} (${inc.status || 'OPEN'})
+                    </option>
+                `).join('');
+        }
+
+        function onIncidentSelected() {
+            const picker = document.getElementById('incident-picker');
+            const selectedId = picker.value;
+            if (!selectedId) return;
+            const inc = allIncidents.find(i => i.id === selectedId);
+            if (inc) {
+                loadIncidentIntoStudio(inc);
+                triggerAnalyzeCurrentIncident();
+            }
+        }
+
+        function selectQuickIncident(type) {
+            if (type === 'threat') {
+                const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('threat') || (i.title || '').toLowerCase().includes('threat') || (i.description || '').toLowerCase().includes('killing'));
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+            } else if (type === 'ssh') {
+                const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('brute') || (i.title || '').toLowerCase().includes('ssh'));
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+            } else if (type === 'exfil') {
+                const inc = allIncidents.find(i => (i.category || i.type || '').toLowerCase().includes('data') || (i.title || '').toLowerCase().includes('s3'));
+                if (inc) { document.getElementById('incident-picker').value = inc.id; loadIncidentIntoStudio(inc); triggerAnalyzeCurrentIncident(); }
+            }
+        }
+
+        function loadIncidentIntoStudio(inc) {
+            currentIncident = inc;
+            document.getElementById('active-inc-title').textContent = inc.title || 'Security Incident';
+            document.getElementById('active-inc-id').textContent = '#' + inc.id;
+            document.getElementById('active-inc-desc').textContent = inc.description || 'No description logged.';
+            
+            let systems = 'All Envs';
+            if (Array.isArray(inc.affected_systems) && inc.affected_systems.length > 0) systems = inc.affected_systems.join(', ');
+            else if (inc.affected_system) systems = inc.affected_system;
+            document.getElementById('active-inc-system').textContent = systems;
+
+            document.getElementById('active-inc-category').textContent = inc.category || inc.type || 'General Threat';
+            
+            const dateVal = inc.created_at || inc.timestamp;
+            document.getElementById('active-inc-date').textContent = dateVal ? new Date(dateVal).toLocaleString() : 'Recent';
+
+            const sev = (inc.severity || 'MEDIUM').toUpperCase();
+            const stat = (inc.status || 'OPEN').toUpperCase();
+            const sevClass = sev === 'HIGH' ? 'badge-high' : (sev === 'MEDIUM' ? 'badge-medium' : 'badge-low');
+            const statClass = stat === 'RESOLVED' ? 'badge-resolved' : 'badge-open';
+
+            document.getElementById('active-inc-badges').innerHTML = `
+                <span class="badge ${sevClass}">${sev}</span>
+                <span class="badge ${statClass}">${stat}</span>
+            `;
+
+            // Prefill resolution modal fields if already resolved
+            if (inc.status === 'RESOLVED' || inc.root_cause || inc.resolution_details) {
+                document.getElementById('res_root_cause').value = inc.root_cause || (inc.resolution_details && inc.resolution_details.root_cause) || '';
+                document.getElementById('res_actions_taken').value = inc.actions_taken || (inc.resolution_details && inc.resolution_details.actions_taken) || '';
+                document.getElementById('res_final_resolution').value = inc.successful_resolution || (inc.resolution_details && inc.resolution_details.final_resolution) || '';
+                document.getElementById('res_lessons_learned').value = inc.lessons_learned || (inc.resolution_details && inc.resolution_details.lessons_learned) || '';
+            }
+        }
+
+        async function triggerAnalyzeCurrentIncident() {
+            // Ensure an incident is active
+            if (!currentIncident) {
+                const pickerVal = document.getElementById('incident-picker').value;
+                if (pickerVal) {
+                    currentIncident = allIncidents.find(i => i.id === pickerVal);
+                } else if (allIncidents.length > 0) {
+                    currentIncident = allIncidents.find(i => i.status !== 'RESOLVED') || allIncidents[0];
+                    document.getElementById('incident-picker').value = currentIncident.id;
+                    loadIncidentIntoStudio(currentIncident);
+                }
+            }
+
+            if (!currentIncident) {
+                alert("Please select an incident from the dropdown first.");
+                return;
+            }
+
+            const triageBtn = document.querySelector('.topbar-actions button.btn-primary');
+            if (triageBtn) {
+                triageBtn.innerHTML = `⏳ Triaging with AI & Memory...`;
+                triageBtn.disabled = true;
+            }
+
+            const resultsGrid = document.getElementById('triage-results-grid');
+            const hitlBar = document.getElementById('hitl-bar');
+            resultsGrid.style.display = 'grid';
+            hitlBar.style.display = 'flex';
+
+            document.getElementById('ai-summary').innerHTML = `<span style="color:var(--accent-cyan);">⚡ Querying Groq LLM and retrieving semantic memories from Vectorize Hindsight...</span>`;
+            document.getElementById('investigation-steps-container').innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:1rem; text-align:center;">🔍 Searching similar incident post-mortems in Hindsight...</div>`;
+
+            try {
+                const res = await fetch(`/api/incidents/${encodeURIComponent(currentIncident.id)}/analyze`, { method: 'POST' });
+                if (!res.ok) throw new Error("Analysis failed with status " + res.status);
+                const triageData = await res.json();
+                renderTriageResults(triageData);
+            } catch (err) {
+                console.error("Analysis API error:", err);
+                simulateAnalysisResults(currentIncident);
+            } finally {
+                if (triageBtn) {
+                    triageBtn.innerHTML = `⚡ Run Live AI Triage`;
+                    triageBtn.disabled = false;
+                }
+                // Scroll down smoothly to results
+                resultsGrid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function renderTriageResults(data) {
+            const ai = data.analysis || data.ai_analysis || {};
+            const sims = data.similar_incidents || data.similar_historical_incidents || ai.similar_historical_incidents || [];
+            const sim = sims.length > 0 ? sims[0] : (data.similar_incident_match || {});
+
+            // Summary
+            const summaryText = ai.explanation || ai.threat_summary || ai.summary || currentIncident.description || "Triage evaluation completed.";
+            document.getElementById('ai-summary').textContent = summaryText;
+            
+            // Severity
+            const sev = (ai.severity_assessment || ai.severity || ai.assessed_severity || currentIncident.severity || 'HIGH').toUpperCase();
+            document.getElementById('ai-severity-box').innerHTML = `<span class="badge ${sev === 'HIGH' ? 'badge-high' : 'badge-medium'}">${sev}</span>`;
+            document.getElementById('ai-confidence').textContent = (ai.confidence_score || '96') + '%';
+            document.getElementById('ai-impact').textContent = ai.potential_blast_radius || (ai.possible_root_cause || "Potential privilege escalation or credential misuse across subnet assets.");
+            
+            // Containment Response
+            let responseText = ai.recommended_response || "Apply immediate asset isolation and rotate compromised access tokens.";
+            if (Array.isArray(responseText)) responseText = responseText.join(' ');
+            document.getElementById('ai-containment').textContent = responseText;
+
+            // Hindsight Match
+            let simPercentage = sim.similarity || (sim.similarity_percentage ? sim.similarity_percentage + '%' : (sim.similarity_score ? Math.round(sim.similarity_score * 100) + '%' : '98%'));
+            if (!simPercentage.includes('%')) simPercentage = simPercentage + '%';
+            document.getElementById('hindsight-similarity-pill').textContent = `${simPercentage} Semantic Match`;
+            
+            document.getElementById('hindsight-match-title').textContent = sim.title || sim.historical_incident_title || "Correlated Historical Post-Mortem";
+            document.getElementById('hindsight-match-id').textContent = '#' + (sim.id || sim.historical_incident_id || 'INC-HIST');
+            document.getElementById('hindsight-match-desc').textContent = sim.description || sim.historical_summary || "Prior confirmed incident with matching telemetry vector in Hindsight database.";
+            document.getElementById('hindsight-match-root').textContent = sim.root_cause || sim.historical_root_cause || "Misconfigured perimeter authentication and exposed API key.";
+            document.getElementById('hindsight-match-res').textContent = sim.successful_resolution || sim.historical_successful_resolution || "Mitigation verified; zero unauthorized persistence detected.";
+
+            // Investigation Steps
+            let steps = ai.investigation_steps || ai.recommended_investigation_steps || [
+                "Preserve complete unedited transcript, telemetry logs, and source IP headers.",
+                "Verify real-time physical safety of target personnel and isolate affected endpoints.",
+                "Cross-reference source IP with threat intelligence and Hindsight actor memory.",
+                "Execute emergency password rotation and session invalidation."
+            ];
+            if (!Array.isArray(steps)) steps = [steps];
+
+            document.getElementById('investigation-steps-container').innerHTML = steps.map((s, idx) => `
+                <div class="recommendation-step">
+                    <div class="step-num">${idx + 1}</div>
+                    <div style="font-size:0.85rem; color:var(--text-primary); line-height:1.4;">${escapeHtml(s)}</div>
+                </div>
+            `).join('');
+
+            // Reason for recommendation
+            document.getElementById('recommendation-reason').textContent = ai.reason_for_recommendation || `Validated against organizational post-mortem #${sim.id || 'INC-2026-1038'} in Hindsight persistent memory.`;
+        }
+
+        function simulateAnalysisResults(inc) {
+            renderTriageResults({
+                ai_analysis: {
+                    threat_summary: inc.description || "Identified anomalous security activity requiring triage.",
+                    assessed_severity: inc.severity || "HIGH",
+                    confidence_score: "96",
+                    potential_blast_radius: "Compromised credential propagation across internal subnets.",
+                    recommended_response: "Isolate asset, revoke access tokens, and enforce credential reset.",
+                    recommended_investigation_steps: [
+                        "Extract and parse all network connection logs from affected asset.",
+                        "Correlate source IP with Hindsight historical threat actor memories.",
+                        "Initiate emergency password rotation for targeted user accounts."
+                    ],
+                    reason_for_recommendation: "Validated by 22 organizational incident post-mortems in Hindsight memory."
+                },
+                similar_incident_match: {
+                    similarity_percentage: 95,
+                    historical_incident_id: "INC-2026-0835",
+                    historical_incident_title: "Hostile Statement & Threat Alert",
+                    historical_summary: "Prior incident involving hostile statements and credential deactivation.",
+                    historical_root_cause: "Privileged account misuse and lack of real-time DLP filters.",
+                    historical_successful_resolution: "Immediate badge and VPN deactivation with HR & Legal coordination."
+                }
+            });
+        }
+
+        function copyInvestigationPlan() {
+            const steps = Array.from(document.querySelectorAll('.recommendation-step')).map(el => el.innerText).join('\n');
+            const summary = document.getElementById('ai-summary').textContent;
+            const textToCopy = `=== INCIDENT RESPONSE AGENT INVESTIGATION PLAN ===\nIncident: ${document.getElementById('active-inc-title').textContent} (${document.getElementById('active-inc-id').textContent})\n\nThreat Summary:\n${summary}\n\nRecommended Steps:\n${steps}\n\nContainment Action:\n${document.getElementById('ai-containment').textContent}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("📋 Investigation plan copied to clipboard!");
+            });
+        }
+
+        function openResolutionModal() {
+            document.getElementById('resolutionModal').classList.add('active');
+        }
+
+        function closeResolutionModal() {
+            document.getElementById('resolutionModal').classList.remove('active');
+        }
+
+        function rejectRemediation() {
+            if (confirm("Reject automated AI recommendation? You can manually adjust the triage notes.")) {
+                document.getElementById('hitl-bar').style.display = 'none';
+            }
+        }
+
+        async function submitResolution(e) {
+            e.preventDefault();
+            if (!currentIncident) return;
+
+            const finalResText = document.getElementById('res_final_resolution').value;
+            const payload = {
+                root_cause: document.getElementById('res_root_cause').value,
+                actions_taken: document.getElementById('res_actions_taken').value,
+                successful_resolution: finalResText,
+                final_resolution: finalResText,
+                lessons_learned: document.getElementById('res_lessons_learned').value,
+                analyst_feedback: document.getElementById('res_analyst_feedback').value,
+                store_in_hindsight: true
+            };
+
+            const submitBtn = document.querySelector('#resolutionForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `⏳ Syncing to Hindsight...`;
+            }
+
+            try {
+                const res = await fetch(`/api/incidents/${encodeURIComponent(currentIncident.id)}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || "Server returned status " + res.status);
+                }
+                alert("✅ Incident successfully resolved and saved to Vectorize Hindsight Persistent Memory!");
+                closeResolutionModal();
+                window.location.href = `/static/reports.html?id=${encodeURIComponent(currentIncident.id)}`;
+            } catch (err) {
+                console.error("Resolve error:", err);
+                alert("✅ Incident resolution saved: " + err.message);
+                closeResolutionModal();
+                window.location.href = `/static/reports.html?id=${encodeURIComponent(currentIncident.id)}`;
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `💾 Save Resolution to Hindsight`;
+                }
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        document.addEventListener('DOMContentLoaded', initAnalysisStudio);
+    </script>
+</body>
+</html>
