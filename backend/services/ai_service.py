@@ -20,7 +20,7 @@ class AIService:
     @property
     def model(self) -> str:
         load_dotenv(dotenv_path=ENV_PATH, override=True)
-        return os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+        return os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 
     async def analyze_incident(
         self,
@@ -37,7 +37,7 @@ class AIService:
 
         try:
             prompt = self._build_prompt(incident_data, historical_memories)
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=12.0) as client:
                 response = await client.post(
                     self.api_url,
                     headers={

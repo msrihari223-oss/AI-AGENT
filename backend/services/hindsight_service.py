@@ -152,7 +152,7 @@ class HindsightService:
         # 1. Try Hindsight Cloud Recall
         if self.api_key:
             try:
-                async with httpx.AsyncClient(timeout=20.0) as client:
+                async with httpx.AsyncClient(timeout=3.5) as client:
                     response = await client.post(
                         f"{self.api_url}/v1/default/banks/{self.bank_id}/memories/recall",
                         headers={
