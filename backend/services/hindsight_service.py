@@ -96,39 +96,34 @@ class HindsightService:
             f"Post-Mortem Summary: {post_mortem}"
         )
 
-        # 1. If Hindsight API Key is configured, persist to Hindsight Cloud/Instance
+        # 1. If Hindsight API Key is configured, persist to Hindsight Cloud asynchronously in background
         if self.api_key:
+            import asyncio
+            async def _persist_cloud():
+                try:
+                    async with httpx.AsyncClient(timeout=3.0) as client:
+                        await client.post(
+                            f"{self.api_url}/v1/default/banks/{self.bank_id}/memories",
+                            headers={
+                                "Authorization": f"Bearer {self.api_key}",
+                                "Content-Type": "application/json"
+                            },
+                            json={
+                                "items": [
+                                    {
+                                        "content": document_content,
+                                        "context": f"cybersecurity_incident_{incident_type}",
+                                        "document_id": incident_id
+                                    }
+                                ]
+                            }
+                        )
+                except Exception as e:
+                    pass
             try:
-                async with httpx.AsyncClient(timeout=20.0) as client:
-                    response = await client.post(
-                        f"{self.api_url}/v1/default/banks/{self.bank_id}/memories",
-                        headers={
-                            "Authorization": f"Bearer {self.api_key}",
-                            "Content-Type": "application/json"
-                        },
-                        json={
-                            "items": [
-                                {
-                                    "content": document_content,
-                                    "context": f"cybersecurity_incident_{incident_type}",
-                                    "document_id": incident_id
-                                }
-                            ]
-                        }
-                    )
-                    if response.status_code in [200, 201]:
-                        res_data = response.json()
-                        return {
-                            "status": "success",
-                            "memory_id": res_data.get("operation_id") or f"hs-{incident_id}",
-                            "mode": "hindsight_cloud",
-                            "bank_id": self.bank_id,
-                            "data": memory_metadata
-                        }
-                    else:
-                        print(f"Hindsight API Store Notice ({response.status_code}): {response.text}")
-            except Exception as e:
-                print(f"Hindsight Cloud Store Connection Error: {e}")
+                asyncio.create_task(_persist_cloud())
+            except Exception:
+                pass
 
         # 2. Local Persistent Storage Fallback (Always maintains synchronized bank state)
         return {
