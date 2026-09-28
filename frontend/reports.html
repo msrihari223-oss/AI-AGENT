@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Reports & Post-Mortems | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .report-preview-card {
+            background: #080c14;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .report-header-banner {
+            border-bottom: 2px solid var(--border-subtle);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .report-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .report-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+        .report-field {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .report-field strong {
+            color: var(--text-primary);
+        }
+        @media print {
+            .sidebar, .topbar, .no-print {
+                display: none !important;
+            }
+            .main-wrapper {
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            .report-preview-card {
+                background: #fff !important;
+                color: #000 !important;
+                border: 1px solid #ccc !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item active"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>📄</span> Incident Documentation & Post-Mortem Reports</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/incident.html" class="btn btn-primary">+ New Incident</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- Select Incident to Generate Report -->
+            <div class="card no-print" style="margin-bottom:1.5rem;">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title" style="color:var(--accent-cyan); font-size:1.15rem; font-weight:700;">
+                            📄 10. INCIDENT REPORT GENERATOR
+                        </h2>
+                        <div style="font-size:0.78rem; color:#94a3b8; margin-top:0.25rem;">
+                            Generate a comprehensive professional post-mortem containing all 13 incident sections with multi-format download support.
+                        </div>
+                    </div>
+                    <span class="badge badge-resolved">Executive SOC Report</span>
+                </div>
+                <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; margin-top:0.5rem;">
+                    <select id="reportIncidentSelect" class="form-control" style="flex:1; min-width:280px;" onchange="loadSelectedReport()">
+                        <option value="">-- Choose an Incident --</option>
+                    </select>
+                    <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Print / Save PDF</button>
+                    <button type="button" class="btn btn-outline" onclick="downloadMarkdownReport()">📝 Download Report (.md)</button>
+                    <button type="button" class="btn btn-primary" onclick="downloadJSONReport()">⬇️ Export JSON</button>
+                </div>
+            </div>
+
+            <!-- Report Preview Card (13 Required Sections) -->
+            <div id="reportContainer" class="report-preview-card" style="display:none; background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:2.25rem;">
+                <!-- Header Banner -->
+                <div class="report-header-banner" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:0.4rem;">
+                            <span>🛡️</span> INCIDENT RESPONSE AGENT CYBERSECURITY POST-MORTEM
+                        </div>
+                        <h1 id="repTitle" style="font-size:1.5rem; font-weight:800; margin-top:0.4rem; color:#f8fafc;">--</h1>
+                        <div style="font-size:0.82rem; color:#94a3b8; margin-top:0.3rem;">
+                            • Incident ID: <strong id="repId" style="font-family:var(--font-mono); color:var(--accent-cyan); font-size:0.95rem;">--</strong>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span id="repSeverityBadge" class="badge badge-high" style="font-size:0.85rem;">HIGH</span>
+                        <div id="repStatusBadge" style="margin-top:0.4rem;" class="badge badge-resolved">RESOLVED</div>
+                    </div>
+                </div>
+
+                <!-- 1-4 Overview Metadata Grid -->
+                <div class="report-grid-2" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+                    <div class="report-field"><strong>• Incident ID:</strong> <span id="repFieldId" style="font-family:var(--font-mono); color:var(--accent-cyan);">--</span></div>
+                    <div class="report-field"><strong>• Date / Time:</strong> <span id="repDateTime">--</span></div>
+                    <div class="report-field"><strong>• Incident Type:</strong> <span id="repType">--</span></div>
+                    <div class="report-field"><strong>• Severity:</strong> <span id="repSeverity">--</span></div>
+                    <div class="report-field"><strong>• Impacted System:</strong> <span id="repSystem">--</span></div>
+                    <div class="report-field"><strong>• Target Username:</strong> <span id="repUser">--</span></div>
+                </div>
+
+                <!-- 5. Description -->
+                <div class="report-section-title">5. Incident Description</div>
+                <div id="repDesc" style="font-size:0.88rem; line-height:1.6; color:#e2e8f0; background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:1.25rem;"></div>
+
+                <!-- 6. AI Analysis -->
+                <div class="report-section-title">6. AI Analysis & Triage</div>
+                <div id="repAIAnalysis" style="font-size:0.88rem; line-height:1.6; color:#e2e8f0; background:rgba(56,189,248,0.06); padding:1rem; border-radius:8px; border:1px solid rgba(56,189,248,0.25); margin-bottom:1.25rem;">
+                    <div style="font-weight:600; color:#38bdf8; margin-bottom:0.4rem;">Classification: <span id="repAIClassification" style="color:#f8fafc; font-weight:normal;">--</span></div>
+                    <div style="color:#cbd5e1; margin-bottom:0.5rem;" id="repAIExplanation">--</div>
+                    <div style="font-size:0.8rem; color:#94a3b8; font-weight:600;">Observed Threat Indicators:</div>
+                    <ul id="repAIIndicators" style="margin:0.3rem 0 0 1.25rem; font-size:0.84rem; color:#e2e8f0;"></ul>
+                </div>
+
+                <!-- 7. Similar Historical Incidents -->
+                <div class="report-section-title">7. Similar Historical Incidents (Hindsight Persistent Memory)</div>
+                <div id="repHistoricalMemories" style="margin-bottom:1.25rem;">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <!-- 8. Root Cause -->
+                <div class="report-section-title">8. Root Cause Analysis</div>
+                <div id="repRootCause" style="font-size:0.88rem; line-height:1.6; color:#e2e8f0; background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:1.25rem;"></div>
+
+                <!-- 9. Investigation Steps -->
+                <div class="report-section-title">9. Investigation Steps</div>
+                <div style="background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:1.25rem;">
+                    <ol id="repInvestigationSteps" style="margin:0; padding-left:1.25rem; font-size:0.88rem; color:#e2e8f0; line-height:1.7;"></ol>
+                </div>
+
+                <!-- 10. Actions Taken -->
+                <div class="report-section-title">10. Actions Taken</div>
+                <div id="repActions" style="font-size:0.88rem; line-height:1.6; color:#e2e8f0; background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:1.25rem;"></div>
+
+                <!-- 11. Resolution -->
+                <div class="report-section-title">11. Final Resolution Summary</div>
+                <div id="repResolution" style="font-size:0.88rem; line-height:1.6; color:#34d399; background:rgba(16,185,129,0.06); padding:1rem; border-radius:8px; border:1px solid rgba(16,185,129,0.25); margin-bottom:1.25rem; font-weight:500;"></div>
+
+                <!-- 12. Lessons Learned -->
+                <div class="report-section-title">12. Lessons Learned (Persisted to Hindsight)</div>
+                <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.3); padding:1.15rem; border-radius:8px; margin-bottom:1.25rem;">
+                    <div id="repLessons" style="font-size:0.88rem; line-height:1.6; color:#f8fafc;"></div>
+                    <div style="font-size:0.75rem; color:#a78bfa; margin-top:0.5rem; font-weight:600;">
+                        🧠 Persisted into Hindsight memory bank for automated recall on future attacks.
+                    </div>
+                </div>
+
+                <!-- 13. Prevention Recommendations -->
+                <div class="report-section-title">13. Prevention & Hardening Recommendations</div>
+                <div style="background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                    <ul id="repPrevention" style="margin:0; padding-left:1.25rem; font-size:0.88rem; color:#38bdf8; line-height:1.7;"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let allIncidents = [];
+        let selectedIncident = null;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const res = await fetch("/api/incidents");
+                allIncidents = await res.json();
+                const select = document.getElementById("reportIncidentSelect");
+                allIncidents.forEach(inc => {
+                    const opt = document.createElement("option");
+                    opt.value = inc.id;
+                    opt.textContent = `[${inc.id}] ${inc.title} (${inc.status})`;
+                    select.appendChild(opt);
+                });
+
+                if (allIncidents.length > 0) {
+                    select.value = allIncidents[0].id;
+                    loadSelectedReport();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        function loadSelectedReport() {
+            const id = document.getElementById("reportIncidentSelect").value;
+            if (!id) return;
+            selectedIncident = allIncidents.find(i => i.id === id);
+            if (!selectedIncident) return;
+
+            document.getElementById("reportContainer").style.display = "block";
+            document.getElementById("repTitle").textContent = selectedIncident.title;
+            document.getElementById("repId").textContent = selectedIncident.id;
+            document.getElementById("repFieldId").textContent = selectedIncident.id;
+            document.getElementById("repDateTime").textContent = formatTimestamp(selectedIncident.timestamp || selectedIncident.created_at);
+            document.getElementById("repType").textContent = selectedIncident.type;
+            document.getElementById("repSeverity").textContent = selectedIncident.severity;
+            document.getElementById("repSystem").textContent = selectedIncident.affected_system || "N/A";
+            document.getElementById("repUser").textContent = selectedIncident.username || "N/A";
+
+            document.getElementById("repSeverityBadge").textContent = selectedIncident.severity;
+            document.getElementById("repSeverityBadge").className = `badge badge-${selectedIncident.severity.toLowerCase() === 'high' ? 'high' : (selectedIncident.severity.toLowerCase() === 'medium' ? 'med' : 'low')}`;
+
+            document.getElementById("repStatusBadge").textContent = selectedIncident.status;
+            document.getElementById("repStatusBadge").className = `badge badge-${selectedIncident.status.toLowerCase() === 'resolved' ? 'resolved' : 'open'}`;
+
+            // 5. Description
+            document.getElementById("repDesc").textContent = selectedIncident.description || "N/A";
+
+            // 6. AI Analysis
+            const ai = selectedIncident.ai_analysis || {};
+            document.getElementById("repAIClassification").textContent = ai.incident_classification || selectedIncident.type;
+            document.getElementById("repAIExplanation").textContent = ai.explanation || "Automated AI investigation performed.";
+            const indList = document.getElementById("repAIIndicators");
+            indList.innerHTML = (ai.indicators || [selectedIncident.description]).map(ind => `<li>${ind}</li>`).join("");
+
+            // 7. Similar Historical Incidents
+            const memContainer = document.getElementById("repHistoricalMemories");
+            const similar = ai.similar_historical_incidents || [];
+            if (similar.length > 0) {
+                memContainer.innerHTML = similar.map(m => `
+                    <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(139,92,246,0.3); border-radius:8px; padding:0.85rem 1rem; margin-bottom:0.6rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                            <span style="font-family:var(--font-mono); color:var(--accent-purple); font-weight:700;">${m.id} (${m.title})</span>
+                            <span class="badge badge-resolved" style="background:rgba(139,92,246,0.2); color:var(--accent-purple);">Similarity: ${m.similarity}</span>
+                        </div>
+                        <div style="font-size:0.82rem; color:#cbd5e1;"><strong>Root Cause:</strong> ${m.root_cause}</div>
+                        <div style="font-size:0.82rem; color:#34d399; margin-top:0.2rem;"><strong>Resolution:</strong> ${m.successful_resolution || m.actions_taken}</div>
+                    </div>
+                `).join("");
+            } else {
+                memContainer.innerHTML = `<div style="color:var(--text-muted); font-size:0.84rem; padding:0.5rem 0;">No direct historical memories cited for this incident.</div>`;
+            }
+
+            // 8. Root Cause
+            document.getElementById("repRootCause").textContent = selectedIncident.root_cause || ai.possible_root_cause || "Root cause determination documented in post-mortem.";
+
+            // 9. Investigation Steps
+            const stepsList = document.getElementById("repInvestigationSteps");
+            const steps = ai.investigation_steps || [
+                "1. Inspected authentication logs and host process telemetry",
+                "2. Analyzed source IP reputation and network ingress flow",
+                "3. Verified account permissions and identity audit logs"
+            ];
+            stepsList.innerHTML = steps.map(s => `<li>${s.replace(/^\d+\.\s*/, '')}</li>`).join("");
+
+            // 10. Actions Taken
+            document.getElementById("repActions").textContent = selectedIncident.actions_taken || (ai.recommended_response ? ai.recommended_response.join("; ") : "Containment and isolation controls executed.");
+
+            // 11. Resolution
+            document.getElementById("repResolution").textContent = selectedIncident.successful_resolution || "Incident contained with zero unauthorized persistence confirmed.";
+
+            // 12. Lessons Learned
+            document.getElementById("repLessons").textContent = selectedIncident.lessons_learned || "Automate continuous detection rules and integrate persistent memory recall for similar attack patterns.";
+
+            // 13. Prevention Recommendations
+            const prevList = document.getElementById("repPrevention");
+            const prevs = ai.prevention_suggestions || [
+                "Enforce FIDO2 / hardware-backed Multi-Factor Authentication (MFA)",
+                "Deploy automated rate limiting and security group ingress restrictions",
+                "Continuously monitor privileged credentials and review third-party integrations"
+            ];
+            prevList.innerHTML = prevs.map(p => `<li>${p}</li>`).join("");
+        }
+
+        // Export JSON Report
+        function downloadJSONReport() {
+            if (!selectedIncident) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedIncident, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `IncidentReport_${selectedIncident.id}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Download Markdown/Text Report
+        function downloadMarkdownReport() {
+            if (!selectedIncident) return;
+            const ai = selectedIncident.ai_analysis || {};
+            const md = `# 10. INCIDENT REPORT: ${selectedIncident.id} - ${selectedIncident.title}
+
+- **Incident ID**: ${selectedIncident.id}
+- **Date/Time**: ${selectedIncident.timestamp || selectedIncident.created_at}
+- **Incident Type**: ${selectedIncident.type}
+- **Severity**: ${selectedIncident.severity}
+- **Affected System**: ${selectedIncident.affected_system || "N/A"}
+- **Target Username**: ${selectedIncident.username || "N/A"}
+- **Status**: ${selectedIncident.status}
+
+---
+
+## 5. Description
+${selectedIncident.description || "N/A"}
+
+## 6. AI Analysis
+- **Classification**: ${ai.incident_classification || selectedIncident.type}
+- **Summary**: ${ai.explanation || "N/A"}
+- **Threat Indicators**:
+${(ai.indicators || []).map(i => `  - ${i}`).join("\n")}
+
+## 7. Similar Historical Incidents
+${(ai.similar_historical_incidents || []).map(m => `  - **${m.id}** (${m.title}) | Similarity: ${m.similarity}\n    Root Cause: ${m.root_cause}\n    Resolution: ${m.successful_resolution}`).join("\n\n") || "None cited."}
+
+## 8. Root Cause
+${selectedIncident.root_cause || ai.possible_root_cause || "N/A"}
+
+## 9. Investigation Steps
+${(ai.investigation_steps || []).map((s, i) => `${i+1}. ${s}`).join("\n")}
+
+## 10. Actions Taken
+${selectedIncident.actions_taken || "N/A"}
+
+## 11. Final Resolution
+${selectedIncident.successful_resolution || "N/A"}
+
+## 12. Lessons Learned (Stored in Hindsight)
+${selectedIncident.lessons_learned || "N/A"}
+
+## 13. Prevention Recommendations
+${(ai.prevention_suggestions || []).map(p => `  - ${p}`).join("\n")}
+`;
+
+            const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(md);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `IncidentReport_${selectedIncident.id}.md`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>

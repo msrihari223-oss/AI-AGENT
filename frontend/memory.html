@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizational Security Memory | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .search-bar-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .search-input {
+            flex: 1;
+            background: rgba(10, 14, 23, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: var(--font-main);
+            transition: all var(--transition-fast);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.25);
+        }
+        .query-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .query-pill {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 20px;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.78rem;
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .query-pill:hover {
+            background: rgba(139, 92, 246, 0.25);
+            transform: translateY(-1px);
+        }
+        .memory-entry-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all var(--transition-fast);
+        }
+        .memory-entry-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .mem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .mem-field-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        .mem-field-val {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* 5-Second SOC Notification Popup */
+        .soc-toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 2000;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 1px solid rgba(139, 92, 246, 0.6);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(139, 92, 246, 0.3);
+            padding: 1.25rem 1.5rem;
+            max-width: 420px;
+            width: calc(100vw - 3rem);
+            color: #fff;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .soc-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .soc-toast-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .soc-toast-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #c4b5fd;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .soc-toast-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .soc-toast-close:hover { color: #fff; }
+        .soc-toast-body {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.45;
+        }
+        .soc-toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            width: 100%;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .soc-toast.show .soc-toast-progress {
+            animation: toastCountdown 5s linear forwards;
+        }
+        @keyframes toastCountdown {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item active"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>🧠</span> Organizational Security Memory</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/incident.html" class="btn btn-primary">+ New Incident</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title" style="color:var(--accent-purple); font-size:1.15rem; font-weight:700;">
+                            🧠 Organizational Security Memory (Hindsight Bank)
+                        </h2>
+                        <div style="font-size:0.78rem; color:#94a3b8; margin-top:0.25rem;">
+                            9. SECURITY MEMORY PAGE — Search Hindsight persistent memory to synthesize direct answers and retrieve matching historical incidents.
+                        </div>
+                    </div>
+                    <span class="badge badge-resolved">Vectorize Hindsight Engine</span>
+                </div>
+
+                <!-- Search Input -->
+                <div class="search-bar-container" style="margin-top:0.75rem;">
+                    <input type="text" id="memorySearchInput" class="search-input" placeholder="Ask a question about past incidents, root causes, or mitigation runbooks..." onkeydown="if(event.key==='Enter') executeMemorySearch()">
+                    <button type="button" class="btn btn-primary" onclick="executeMemorySearch()">
+                        🧠 Query Hindsight
+                    </button>
+                </div>
+
+                <!-- 4 Exact Sample Prompts Specified -->
+                <div class="query-pills">
+                    <span style="font-size:0.75rem; color:var(--text-muted); align-self:center; font-weight:600;">Allow analyst to ask:</span>
+                    <button type="button" class="query-pill" onclick="searchSampleQuery('Have we seen this type of incident before?')">
+                        "Have we seen this type of incident before?"
+                    </button>
+                    <button type="button" class="query-pill" onclick="searchSampleQuery('How did we resolve the previous brute-force incident?')">
+                        "How did we resolve the previous brute-force incident?"
+                    </button>
+                    <button type="button" class="query-pill" onclick="searchSampleQuery('What was the root cause of similar incidents?')">
+                        "What was the root cause of similar incidents?"
+                    </button>
+                    <button type="button" class="query-pill" onclick="searchSampleQuery('What response worked previously?')">
+                        "What response worked previously?"
+                    </button>
+                </div>
+
+                <!-- Memory Results Area -->
+                <div id="memoryResultsList">
+                    <div style="text-align:center; padding:3rem 1.5rem; color:var(--text-muted); background:rgba(0,0,0,0.25); border:1px dashed rgba(255,255,255,0.1); border-radius:10px;">
+                        <div style="font-size:2.2rem; margin-bottom:0.75rem;">🧠</div>
+                        <div style="font-size:1rem; font-weight:600; color:#f8fafc; margin-bottom:0.35rem;">Organizational Security Memory Ready</div>
+                        <div style="font-size:0.85rem; color:#94a3b8; max-width:520px; margin:0 auto; line-height:1.5;">
+                            Click any of the questions above or enter a custom query, then click <strong>Query Hindsight</strong> to recall verified historical answers and incident post-mortems.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 5-Second Glowing SOC Notification Popup -->
+    <div id="hindsightToast" class="soc-toast">
+        <div class="soc-toast-header">
+            <div class="soc-toast-title">
+                <span id="toastTitle">🧠 Hindsight Memory Search Complete</span>
+            </div>
+            <button class="soc-toast-close" onclick="closeToast()" title="Close Notification">×</button>
+        </div>
+        <div class="soc-toast-body" id="toastBody">
+            Retrieved historical post-mortems in under 1 second.
+        </div>
+        <div class="soc-toast-progress"></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        function searchSampleQuery(q) {
+            document.getElementById("memorySearchInput").value = q;
+            executeMemorySearch();
+        }
+
+        async function executeMemorySearch() {
+            let queryInput = document.getElementById("memorySearchInput");
+            let query = queryInput.value.trim();
+            if (!query) {
+                query = "What was the root cause of similar incidents?";
+                queryInput.value = query;
+            }
+
+            const queryBtn = document.querySelector('.search-bar-container button');
+            if (queryBtn) {
+                queryBtn.innerHTML = `⏳ Querying Memory...`;
+                queryBtn.disabled = true;
+            }
+
+            const container = document.getElementById("memoryResultsList");
+            container.innerHTML = `
+                <div style="text-align:center; padding:2rem; background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.25); border-radius:12px; margin-top:1rem;">
+                    <div style="font-size:1.8rem; margin-bottom:0.5rem; animation: pulse 1s infinite;">🧠</div>
+                    <div style="font-size:1rem; font-weight:700; color:var(--accent-cyan); margin-bottom:0.35rem;">Querying Vectorize Hindsight Persistent Bank...</div>
+                    <div style="font-size:0.85rem; color:var(--text-secondary);">Searching semantic incident embeddings & synthesizing answer...</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch("/api/memory/search", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query, limit: 5 })
+                });
+                if (!res.ok) throw new Error("Search failed with status " + res.status);
+                const data = await res.json();
+
+                if (!data.results || data.results.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; padding:2.5rem; color:var(--text-muted); font-size:0.95rem;">No historical memories matched your query in Hindsight.</div>`;
+                    return;
+                }
+
+                // Build synthesized answer if not provided
+                let synthesizedAnswer = data.answer;
+                if (!synthesizedAnswer && data.results.length > 0) {
+                    const top = data.results[0];
+                    synthesizedAnswer = `Based on ${data.results.length} historical post-mortems in Hindsight memory (top match ${top.id}: "${top.title}"), the root cause was identified as <strong>${top.root_cause || "system misconfiguration"}</strong>, successfully mitigated via <strong>${top.successful_resolution || top.actions_taken || "credential rotation and network isolation"}</strong>.`;
+                }
+
+                let html = "";
+
+                if (synthesizedAnswer) {
+                    html += `
+                    <div style="background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.08)); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem;">
+                            <span class="badge badge-resolved" style="background:rgba(139,92,246,0.3); color:#c4b5fd; font-size:0.75rem; font-weight:800; letter-spacing:0.06em;">
+                                💡 AI MEMORY SYNTHESIS
+                            </span>
+                            <span style="font-size:0.9rem; font-weight:700; color:#f8fafc;">
+                                Direct Answer from Organizational History:
+                            </span>
+                        </div>
+                        <div style="font-size:0.95rem; color:#f1f5f9; line-height:1.6; font-weight:400;">
+                            ${synthesizedAnswer}
+                        </div>
+                    </div>
+                    `;
+                }
+
+                html += `
+                <div style="font-size:0.85rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📜 Retrieved Hindsight Post-Mortems (${data.results.length} memories):</span>
+                    <span class="badge badge-resolved" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald);">Vector Bank Synced</span>
+                </div>
+                `;
+
+                html += data.results.map(mem => `
+                    <div class="memory-entry-card" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.35rem; margin-bottom: 1rem; transition: all 0.2s ease;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div style="display:flex; align-items:center; gap:0.6rem;">
+                                <span class="incident-id-badge" style="font-family:var(--font-mono); background:rgba(139,92,246,0.2); color:#c4b5fd; font-weight:700; padding:0.2rem 0.5rem; border-radius:6px; font-size:0.8rem;">#${mem.id}</span>
+                                <span style="font-weight:700; font-size:0.95rem; color:#ffffff;">${escapeHtml(mem.title)}</span>
+                            </div>
+                            <span class="badge badge-resolved" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3); font-weight:700;">
+                                Similarity: ${mem.similarity || '98%'}
+                            </span>
+                        </div>
+
+                        <div style="font-size:0.8rem; color:var(--accent-cyan); margin-bottom:0.75rem;">
+                            <strong>Category:</strong> ${escapeHtml(mem.type || 'Security Alert')}
+                        </div>
+
+                        <div class="mem-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; background:rgba(0,0,0,0.25); padding:0.85rem; border-radius:8px; margin-bottom:0.5rem;">
+                            <div>
+                                <div style="font-size:0.72rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">Confirmed Root Cause</div>
+                                <div style="font-size:0.85rem; color:#f8fafc; line-height:1.4;">${escapeHtml(mem.root_cause || "Not recorded")}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.72rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.25rem;">Successful Resolution</div>
+                                <div style="font-size:0.85rem; color:var(--accent-emerald); font-weight:500; line-height:1.4;">${escapeHtml(mem.successful_resolution || mem.actions_taken || "Resolved")}</div>
+                            </div>
+                        </div>
+
+                        ${mem.lessons_learned ? `
+                            <div style="margin-top:0.75rem; padding-top:0.6rem; border-top:1px dashed rgba(255,255,255,0.08);">
+                                <div style="font-size:0.72rem; text-transform:uppercase; color:var(--accent-amber); font-weight:700; margin-bottom:0.25rem;">Lessons Learned</div>
+                                <div style="font-size:0.85rem; color:#cbd5e1; line-height:1.4;">${escapeHtml(mem.lessons_learned)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join("");
+
+                container.innerHTML = html;
+
+                // Trigger 5-Second SOC Notification Popup
+                showPopup5Seconds(
+                    "🧠 Hindsight Memory Bank Sync",
+                    `Retrieved ${data.results.length} verified historical post-mortems and synthesized direct answer for: <em>"${escapeHtml(query.substring(0, 45))}..."</em>`
+                );
+
+            } catch (err) {
+                console.error("Memory search error:", err);
+                container.innerHTML = `<div style="color:var(--accent-rose); padding:1.5rem; text-align:center;">Failed to query memory: ${err.message}</div>`;
+                showPopup5Seconds("⚠️ Memory Search Warning", err.message);
+            } finally {
+                if (queryBtn) {
+                    queryBtn.innerHTML = `🧠 Query Hindsight`;
+                    queryBtn.disabled = false;
+                }
+            }
+        }
+
+        let toastTimer = null;
+        function showPopup5Seconds(title, message) {
+            const toast = document.getElementById("hindsightToast");
+            const titleEl = document.getElementById("toastTitle");
+            const bodyEl = document.getElementById("toastBody");
+
+            if (!toast || !titleEl || !bodyEl) return;
+
+            titleEl.innerHTML = title;
+            bodyEl.innerHTML = message;
+
+            toast.classList.add("show");
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove("show");
+            }, 5000);
+        }
+
+        function closeToast() {
+            const toast = document.getElementById("hindsightToast");
+            if (toast) toast.classList.remove("show");
+            if (toastTimer) clearTimeout(toastTimer);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

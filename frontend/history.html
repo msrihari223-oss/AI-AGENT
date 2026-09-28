@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident History | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.5rem;
+            background: rgba(10, 14, 23, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: all var(--transition-fast);
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+        }
+        .search-box .search-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-right: 0.25rem;
+        }
+        .filter-pill {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        .filter-pill:hover {
+            border-color: var(--accent-cyan);
+            color: #fff;
+        }
+        .filter-pill.active {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        .history-count-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .action-btn-group {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .btn-xs {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .btn-analyze {
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--accent-cyan);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        .btn-analyze:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+        .btn-report {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .btn-report:hover {
+            background: var(--accent-purple);
+            color: #fff;
+        }
+        .btn-inspect {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border-color: var(--border-subtle);
+        }
+        .btn-inspect:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+        .severity-dot-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .severity-high .severity-dot-indicator { background: var(--accent-rose); box-shadow: 0 0 8px var(--accent-rose); }
+        .severity-medium .severity-dot-indicator { background: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
+        .severity-low .severity-dot-indicator { background: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald); }
+
+        /* Detail Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-dialog {
+            background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            border-radius: 16px;
+            max-width: 760px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.15);
+            padding: 2rem;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #fff; }
+        .detail-row {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+            font-weight: 700;
+        }
+        .detail-val {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation with full 6 pages -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item active"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>📜</span> Incident History & Audit Ledger</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/incident.html" class="btn btn-primary">+ Log New Incident</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- Filter & Search Toolbar -->
+            <div class="filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="incident-search-input" placeholder="Search by ID, title, affected systems, root cause...">
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Severity:</span>
+                    <button class="filter-pill active" data-filter-type="severity" data-val="ALL">All</button>
+                    <button class="filter-pill" data-filter-type="severity" data-val="HIGH">High</button>
+                    <button class="filter-pill" data-filter-type="severity" data-val="MEDIUM">Medium</button>
+                    <button class="filter-pill" data-filter-type="severity" data-val="LOW">Low</button>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Status:</span>
+                    <button class="filter-pill active" data-filter-type="status" data-val="ALL">All</button>
+                    <button class="filter-pill" data-filter-type="status" data-val="OPEN">Open</button>
+                    <button class="filter-pill" data-filter-type="status" data-val="INVESTIGATING">Investigating</button>
+                    <button class="filter-pill" data-filter-type="status" data-val="RESOLVED">Resolved</button>
+                </div>
+
+                <div class="history-count-badge" id="history-total-count">
+                    Showing 0 incidents
+                </div>
+            </div>
+
+            <!-- Incident History Table Card -->
+            <div class="card">
+                <div class="card-header" style="justify-content: space-between;">
+                    <h2 class="card-title">🛡️ Security Incident Log Archive</h2>
+                    <span class="badge badge-resolved" id="ledger-sync-indicator">Synchronized with Hindsight Vector DB</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="soc-table">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Title & Summary</th>
+                                <th>Category</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Affected Asset</th>
+                                <th>Created Date</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="8" style="text-align:center; color:var(--text-muted); padding:3rem;">
+                                    Loading incident records from database...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Quick Inspection Modal -->
+    <div class="modal-overlay" id="inspectModal">
+        <div class="modal-dialog">
+            <button class="modal-close" onclick="closeInspectModal()">×</button>
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
+                <span style="font-size:1.5rem;" id="modal-icon">🚨</span>
+                <div>
+                    <h2 style="font-size:1.25rem; font-weight:700;" id="modal-title">Incident Details</h2>
+                    <span style="font-family:var(--font-mono); color:var(--accent-cyan); font-size:0.85rem;" id="modal-id">#INC-000</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-title">Description</div>
+                <div class="detail-val" id="modal-desc">--</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;" class="detail-row">
+                <div>
+                    <div class="detail-title">Category</div>
+                    <div class="detail-val" id="modal-cat">--</div>
+                </div>
+                <div>
+                    <div class="detail-title">Severity & Status</div>
+                    <div class="detail-val" id="modal-sev-status">--</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-title">Target / Affected Systems</div>
+                <div class="detail-val" id="modal-systems">--</div>
+            </div>
+
+            <div class="detail-row" id="modal-resolution-section" style="display:none;">
+                <div class="detail-title" style="color:var(--accent-emerald);">Resolution Post-Mortem</div>
+                <div class="detail-val" style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); padding:1rem; border-radius:8px; font-size:0.85rem;">
+                    <p><strong>Root Cause:</strong> <span id="modal-root-cause">--</span></p>
+                    <p style="margin-top:0.5rem;"><strong>Actions Taken:</strong> <span id="modal-actions-taken">--</span></p>
+                    <p style="margin-top:0.5rem;"><strong>Final Resolution:</strong> <span id="modal-final-resolution">--</span></p>
+                    <p style="margin-top:0.5rem;"><strong>Lessons Learned:</strong> <span id="modal-lessons">--</span></p>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+                <button class="btn btn-secondary" onclick="closeInspectModal()">Close</button>
+                <a href="#" id="modal-action-analyze-link" class="btn btn-primary">⚡ Open in Analysis Studio</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let allIncidents = [];
+        let currentSeverityFilter = 'ALL';
+        let currentStatusFilter = 'ALL';
+        let searchQuery = '';
+
+        async function loadIncidentHistory() {
+            try {
+                const res = await fetch('/api/incidents');
+                if (!res.ok) throw new Error("Failed to fetch incidents");
+                allIncidents = await res.json();
+                renderHistoryTable();
+            } catch (err) {
+                console.error("Error loading incidents:", err);
+                document.getElementById('history-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align:center; color:var(--accent-rose); padding:2rem;">
+                            Failed to load incidents. Please ensure backend is running.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            const totalCountEl = document.getElementById('history-total-count');
+
+            let filtered = allIncidents.filter(inc => {
+                const sev = (inc.severity || 'MEDIUM').toUpperCase();
+                const status = (inc.status || 'OPEN').toUpperCase();
+                const matchesSev = (currentSeverityFilter === 'ALL') || (sev === currentSeverityFilter);
+                const matchesStatus = (currentStatusFilter === 'ALL') || (status === currentStatusFilter);
+                
+                const q = searchQuery.toLowerCase().trim();
+                const systemsText = (Array.isArray(inc.affected_systems) ? inc.affected_systems.join(' ') : (inc.affected_system || '')).toLowerCase();
+                const catText = (inc.category || inc.type || '').toLowerCase();
+                const titleText = (inc.title || '').toLowerCase();
+                const descText = (inc.description || '').toLowerCase();
+                const idText = (inc.id || '').toLowerCase();
+                const rootText = (inc.root_cause || (inc.resolution_details && inc.resolution_details.root_cause) || '').toLowerCase();
+
+                const matchesSearch = !q || 
+                    idText.includes(q) ||
+                    titleText.includes(q) ||
+                    descText.includes(q) ||
+                    catText.includes(q) ||
+                    systemsText.includes(q) ||
+                    rootText.includes(q);
+
+                return matchesSev && matchesStatus && matchesSearch;
+            });
+
+            totalCountEl.textContent = `Showing ${filtered.length} of ${allIncidents.length} incidents`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align:center; color:var(--text-muted); padding:3rem;">
+                            No incidents match your filter criteria.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(inc => {
+                const sev = (inc.severity || 'MEDIUM').toUpperCase();
+                const status = (inc.status || 'OPEN').toUpperCase();
+                const sevClass = sev === 'HIGH' ? 'badge-high severity-high' : (sev === 'MEDIUM' ? 'badge-medium severity-medium' : 'badge-low severity-low');
+                const statusClass = status === 'RESOLVED' ? 'badge-resolved' : (status === 'INVESTIGATING' ? 'badge-investigating' : 'badge-open');
+                
+                let systems = 'All Envs';
+                if (Array.isArray(inc.affected_systems) && inc.affected_systems.length > 0) {
+                    systems = inc.affected_systems.join(', ');
+                } else if (inc.affected_system) {
+                    systems = inc.affected_system;
+                }
+
+                const cat = inc.category || inc.type || 'Security Alert';
+                const dateVal = inc.created_at || inc.timestamp;
+                const createdDate = dateVal ? new Date(dateVal).toLocaleDateString() + ' ' + new Date(dateVal).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Recent';
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="incident-id-badge">${escapeHtml(inc.id)}</span>
+                        </td>
+                        <td>
+                            <div style="font-weight:600; color:#fff;">${escapeHtml(inc.title || 'Untitled Incident')}</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${escapeHtml(inc.description || '')}
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size:0.8rem; color:var(--text-secondary); background:rgba(255,255,255,0.04); padding:0.2rem 0.5rem; border-radius:4px;">
+                                ${escapeHtml(cat)}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${sevClass}">
+                                <span class="severity-dot-indicator"></span>${sev}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${statusClass}">${status}</span>
+                        </td>
+                        <td>
+                            <span style="font-family:var(--font-mono); font-size:0.8rem; color:var(--accent-cyan); max-width:180px; display:inline-block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(systems)}">${escapeHtml(systems)}</span>
+                        </td>
+                        <td style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">
+                            ${createdDate}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-btn-group" style="justify-content: flex-end;">
+                                <button class="btn-xs btn-inspect" onclick="inspectIncident('${escapeHtml(inc.id)}')">👁️ View</button>
+                                <a href="/static/analysis.html?id=${encodeURIComponent(inc.id)}" class="btn-xs btn-analyze">⚡ Triage</a>
+                                <a href="/static/reports.html?id=${encodeURIComponent(inc.id)}" class="btn-xs btn-report">📄 Report</a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function inspectIncident(id) {
+            const inc = allIncidents.find(i => i.id === id);
+            if (!inc) return;
+
+            document.getElementById('modal-id').textContent = inc.id;
+            document.getElementById('modal-title').textContent = inc.title || 'Security Incident';
+            document.getElementById('modal-desc').textContent = inc.description || 'No description provided.';
+            document.getElementById('modal-cat').textContent = inc.category || inc.type || 'General';
+            
+            const sev = (inc.severity || 'MEDIUM').toUpperCase();
+            const status = (inc.status || 'OPEN').toUpperCase();
+            document.getElementById('modal-sev-status').innerHTML = `
+                <span class="badge ${sev === 'HIGH' ? 'badge-high' : (sev === 'MEDIUM' ? 'badge-medium' : 'badge-low')}">${sev}</span>
+                <span class="badge ${status === 'RESOLVED' ? 'badge-resolved' : (status === 'INVESTIGATING' ? 'badge-investigating' : 'badge-open')}" style="margin-left:0.5rem;">${status}</span>
+            `;
+
+            let systems = 'None specified';
+            if (Array.isArray(inc.affected_systems) && inc.affected_systems.length > 0) {
+                systems = inc.affected_systems.join(', ');
+            } else if (inc.affected_system) {
+                systems = inc.affected_system;
+            }
+            document.getElementById('modal-systems').textContent = systems;
+            
+            const resSec = document.getElementById('modal-resolution-section');
+            const rootCause = inc.root_cause || (inc.resolution_details && inc.resolution_details.root_cause);
+            const actionsTaken = inc.actions_taken || (inc.resolution_details && inc.resolution_details.actions_taken);
+            const finalRes = inc.successful_resolution || (inc.resolution_details && inc.resolution_details.final_resolution);
+            const lessons = inc.lessons_learned || (inc.resolution_details && inc.resolution_details.lessons_learned);
+
+            if (rootCause || actionsTaken || finalRes || lessons) {
+                resSec.style.display = 'block';
+                document.getElementById('modal-root-cause').textContent = rootCause || 'N/A';
+                document.getElementById('modal-actions-taken').textContent = actionsTaken || 'N/A';
+                document.getElementById('modal-final-resolution').textContent = finalRes || 'N/A';
+                document.getElementById('modal-lessons').textContent = lessons || 'N/A';
+            } else {
+                resSec.style.display = 'none';
+            }
+
+            document.getElementById('modal-action-analyze-link').href = `/static/analysis.html?id=${encodeURIComponent(inc.id)}`;
+            document.getElementById('inspectModal').classList.add('active');
+        }
+
+        function closeInspectModal() {
+            document.getElementById('inspectModal').classList.remove('active');
+        }
+
+        // Setup filter listeners
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                const type = this.dataset.filterType;
+                const val = this.dataset.val;
+
+                document.querySelectorAll(`.filter-pill[data-filter-type="${type}"]`).forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                if (type === 'severity') {
+                    currentSeverityFilter = val;
+                } else if (type === 'status') {
+                    currentStatusFilter = val;
+                }
+                renderHistoryTable();
+            });
+        });
+
+        document.getElementById('incident-search-input').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            renderHistoryTable();
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        document.addEventListener('DOMContentLoaded', loadIncidentHistory);
+    </script>
+</body>
+</html>

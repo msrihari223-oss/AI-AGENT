@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Intake & AI Triage | Incident Response Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .form-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .form-control {
+            background: rgba(10, 14, 23, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.6rem 0.85rem;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(6, 182, 212, 0.25);
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        textarea.log-textarea {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #38bdf8;
+            background: #050811;
+        }
+        .scenario-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .scenario-pill:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        .results-container {
+            display: none;
+            margin-top: 1.5rem;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .memory-card-highlight {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .step-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .step-item::before {
+            content: "▹";
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+        .action-decision-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: rgba(10, 14, 23, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+        .action-buttons-row {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-badge">⚡</div>
+            <div class="logo-text">
+                <h2>Incident Response Agent</h2>
+                <span>SOC AI System</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="/static/dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item active"><a href="/static/incident.html"><span class="icon">🚨</span><span>New Incident</span></a></li>
+            <li class="nav-item"><a href="/static/analysis.html"><span class="icon">🔍</span><span>Incident Analysis</span></a></li>
+            <li class="nav-item"><a href="/static/history.html"><span class="icon">📜</span><span>Incident History</span></a></li>
+            <li class="nav-item"><a href="/static/memory.html"><span class="icon">🧠</span><span>Security Memory</span></a></li>
+            <li class="nav-item"><a href="/static/reports.html"><span class="icon">📄</span><span>Reports</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="memory-status-badge" id="hindsight-status-badge">
+                <span class="status-dot"></span>
+                <span id="hindsight-status-text">Hindsight Memory: Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="page-title">
+                <h1><span>🚨</span> Incident Intake & Memory-Aware AI Investigation</h1>
+            </div>
+            <div class="topbar-actions">
+                <a href="/static/dashboard.html" class="btn btn-outline">← Back to Dashboard</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <!-- Quick Preset Scenarios -->
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Demo Templates:</span>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('hostile')">⚠️ "he was killing me" Threat</button>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('abusive')">🤬 Abusive Words & Harassment</button>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('bruteforce')">🎯 SSH Brute-Force Attack</button>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('phishing')">🎣 OAuth Consent Phishing</button>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('malware')">👾 Pod Cryptominer</button>
+                <button type="button" class="scenario-pill" onclick="loadDemoScenario('dataexfil')">📦 S3 Data Exfiltration</button>
+            </div>
+
+            <!-- Incident Intake Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📝 New Incident Telemetry Intake</h2>
+                    <span class="badge badge-open">Human-in-the-Loop Triage</span>
+                </div>
+
+                <form id="incidentForm" onsubmit="handleAnalyzeIncident(event)">
+                    <!-- Row 1: Title & Category -->
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="inc_title">Incident Title *</label>
+                            <input type="text" id="inc_title" class="form-control" placeholder="e.g. Distributed SSH Brute-Force on Auth Gateway" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inc_type">Incident Type / Category *</label>
+                            <select id="inc_type" class="form-control" required>
+                                <option value="Physical Threat & Hostile Statement">Physical Threat & Hostile Statement</option>
+                                <option value="Brute-Force Attack">Brute-Force Attack</option>
+                                <option value="Phishing Attempt">Phishing Attempt</option>
+                                <option value="Data-Access Anomaly">Data-Access Anomaly</option>
+                                <option value="Malware Detection">Malware Detection</option>
+                                <option value="Account Takeover">Account Takeover</option>
+                                <option value="Unauthorized Privilege Change">Unauthorized Privilege Change</option>
+                                <option value="Suspicious Login">Suspicious Login</option>
+                                <option value="Lateral Movement">Lateral Movement</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Severity, System, Source IP -->
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label class="form-label" for="inc_severity">Severity Assessment</label>
+                            <select id="inc_severity" class="form-control">
+                                <option value="AUTO" selected>🤖 AI Auto-Detect (Dynamic Telemetry Analysis)</option>
+                                <option value="HIGH">HIGH - Critical Threat</option>
+                                <option value="MEDIUM">MEDIUM - Elevated Threat</option>
+                                <option value="LOW">LOW - Routine Alert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inc_system">Affected System / Asset *</label>
+                            <input type="text" id="inc_system" class="form-control" placeholder="e.g. auth-gateway-prod-02" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inc_ip">Source IP Address</label>
+                            <input type="text" id="inc_ip" class="form-control" placeholder="e.g. 194.26.29.114">
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Username, Timestamp -->
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="inc_user">Target / Associated Username</label>
+                            <input type="text" id="inc_user" class="form-control" placeholder="e.g. admin_service or user@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inc_time">Detection Timestamp *</label>
+                            <input type="text" id="inc_time" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Description -->
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" for="inc_desc">Incident Description *</label>
+                        <textarea id="inc_desc" class="form-control" rows="3" placeholder="Describe the anomaly, detection alert, or suspicious behavior observed..." required></textarea>
+                    </div>
+
+                    <!-- Row 5: Raw Logs / Additional Info -->
+                    <div class="form-group" style="margin-bottom:1.25rem;">
+                        <label class="form-label" for="inc_logs">Additional Alert / Telemetry Logs</label>
+                        <textarea id="inc_logs" class="form-control log-textarea" rows="4" placeholder="Paste syslog entries, EDR alerts, CloudTrail events, or HTTP headers..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">
+                            🛡️ AI triage will query <strong>Hindsight</strong> for matching past resolutions before producing response steps.
+                        </div>
+                        <div style="display:flex; gap:0.75rem;">
+                            <button type="button" class="btn btn-outline" onclick="resetForm()">Clear</button>
+                            <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                                ⚡ Analyze Incident (AI + Hindsight)
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- AI Investigation & Hindsight Memory Results Container -->
+            <div id="resultsContainer" class="results-container">
+                <!-- Section Header -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <h2 style="font-size:1.15rem; font-weight:700; color:var(--accent-cyan);">
+                        🎯 AI Investigation & Hindsight Memory Synthesis
+                    </h2>
+                    <span id="activeIncidentBadge" class="badge badge-open">Incident Loaded</span>
+                </div>
+
+                <div class="dashboard-grid-2">
+                    <!-- Left Column: AI Triage & Recommendations -->
+                    <div>
+                        <!-- AI Assessment Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🔍 AI Triage & Root Cause Assessment</h3>
+                                <span id="resSeverityBadge" class="badge badge-high">High</span>
+                            </div>
+                            <div style="margin-bottom:0.85rem;">
+                                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Incident Classification</div>
+                                <div id="resClassification" style="font-weight:600; color:var(--text-primary); font-size:0.95rem; margin-top:0.2rem;">--</div>
+                            </div>
+                            <div style="margin-bottom:0.85rem;">
+                                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">AI Explanation & Summary</div>
+                                <div id="resExplanation" style="color:var(--text-secondary); font-size:0.85rem; margin-top:0.2rem; line-height:1.5;">--</div>
+                            </div>
+                            <div style="margin-bottom:0.85rem;">
+                                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Possible Root Cause</div>
+                                <div id="resRootCause" style="color:var(--text-secondary); font-size:0.85rem; margin-top:0.2rem; line-height:1.5;">--</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Observed Threat Indicators</div>
+                                <ul id="resIndicators" class="step-list"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Prevention Suggestions Card -->
+                        <div class="card" style="border-color: rgba(16, 185, 129, 0.3);">
+                            <div class="card-header">
+                                <h3 class="card-title">🛡️ Prevention & Hardening Suggestions</h3>
+                                <span class="badge badge-low">Defensive Controls</span>
+                            </div>
+                            <ul id="resPrevention" class="step-list"></ul>
+                        </div>
+
+                        <!-- 6. Memory-Aware Recommendations Exact Card -->
+                        <div class="card" style="background:#131823; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 1.5rem; position: relative;">
+                            <!-- Top Bar with Copy Button -->
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.85rem;">
+                                <div>
+                                    <h3 class="card-title" style="color: #38bdf8; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em;">
+                                        6. MEMORY-AWARE RECOMMENDATION
+                                    </h3>
+                                    <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.2rem;">
+                                        Synthesized from: <strong>A. Current Incident Information</strong> + <strong>B. Relevant Hindsight Memories</strong>
+                                    </div>
+                                    <div id="resMatchHeader" style="font-size: 0.88rem; font-weight: 600; color: #a78bfa; margin-top: 0.4rem;">
+                                        Similar previous incident found.
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="copyRecommendationCard()" title="Copy to clipboard" style="padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.15); color: #cbd5e1;">
+                                    📋 Copy
+                                </button>
+                            </div>
+
+                            <!-- Recommended Investigation -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.88rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                                    Recommended investigation steps:
+                                </div>
+                                <ol id="resInvestigationSteps" style="padding-left: 1.25rem; font-size: 0.88rem; color: #e2e8f0; line-height: 1.7;">
+                                    <li>Check authentication logs</li>
+                                    <li>Verify account activity</li>
+                                    <li>Investigate source IP</li>
+                                </ol>
+                            </div>
+
+                            <!-- Recommended Response -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.88rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                                    Recommended response:
+                                </div>
+                                <ol id="resActions" style="padding-left: 1.25rem; font-size: 0.88rem; color: #38bdf8; font-weight: 500; line-height: 1.7;">
+                                    <li>Reset credentials</li>
+                                    <li>Enable MFA</li>
+                                    <li>Block suspicious IP</li>
+                                </ol>
+                            </div>
+
+                            <!-- Reason for Recommendation -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.88rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                                    Reason for recommendation:
+                                </div>
+                                <div id="resReason" style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+                                    Automated defense-in-depth isolation procedure tailored to verified attack telemetry and threat vector.
+                                </div>
+                            </div>
+
+                            <!-- Historical Evidence Supporting Recommendation (Clearly Labeled) -->
+                            <div style="margin-bottom: 1.25rem; background: rgba(139, 92, 246, 0.07); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 0.85rem 1rem;">
+                                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.4rem;">
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.25); color: #c4b5fd; font-size: 0.72rem; font-weight: 700; border: 1px solid rgba(139, 92, 246, 0.5); letter-spacing: 0.05em;">
+                                        📜 HISTORICAL INFORMATION
+                                    </span>
+                                    <span style="font-size: 0.82rem; font-weight: 700; color: #a78bfa;">
+                                        Evidence Supporting the Recommendation:
+                                    </span>
+                                </div>
+                                <div id="resEvidence" style="font-size: 0.86rem; color: #e2e8f0; line-height: 1.6;">
+                                    A previous similar incident was successfully resolved using these actions.
+                                </div>
+                            </div>
+
+                            <!-- Human in the Loop Decision Bar (Line by Line) -->
+                            <div class="action-decision-bar" style="margin-top: 1.5rem; background: rgba(10, 14, 23, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1.25rem; width: 100%; box-sizing: border-box;">
+                                <!-- Title Line -->
+                                <div style="margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                                    <div style="font-size: 0.85rem; font-weight: 700; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 0.4rem;">
+                                        🛡️ Human-in-the-Loop SOC Authorization
+                                    </div>
+                                    <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.25rem;">
+                                        Defensive Safety Guardrail Active (Analyst verification required)
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons Stacked Line-by-Line -->
+                                <div id="decisionButtonRow" style="display: flex; flex-direction: column; gap: 0.6rem; width: 100%;">
+                                    <button type="button" class="btn btn-primary" onclick="handleApproveAction()" style="width: 100%; justify-content: center; padding: 0.6rem 1rem; font-size: 0.85rem;">
+                                        ✓ Approve Recommendation
+                                    </button>
+                                    <button type="button" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 0.6rem 1rem; font-size: 0.85rem; border-color: rgba(244,63,94,0.4); color: var(--accent-rose);" onclick="handleRejectAction()">
+                                        ✕ Reject Recommendation
+                                    </button>
+                                    <button type="button" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 0.6rem 1rem; font-size: 0.85rem; border-color: var(--accent-emerald); color: var(--accent-emerald); background: rgba(16,185,129,0.06);" onclick="openResolveModal('approved')">
+                                        ✓ Mark Resolved & Store in Hindsight
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: 5. SIMILAR INCIDENT SEARCH -->
+                    <div>
+                        <div class="card" style="background:#131823; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 1.5rem;">
+                            <div class="card-header" style="padding: 0 0 1rem 0; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                <div>
+                                    <h3 class="card-title" style="color: #38bdf8; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em;">
+                                        5. SIMILAR INCIDENT SEARCH
+                                    </h3>
+                                    <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 0.25rem;">
+                                        For every new incident: Analyze ➔ Search Hindsight ➔ Retrieve memories ➔ Display to analyst
+                                    </div>
+                                </div>
+                                <span class="badge badge-resolved" style="background:rgba(139,92,246,0.2); color:var(--accent-purple); border:1px solid rgba(139,92,246,0.4);">
+                                    Hindsight Recall
+                                </span>
+                            </div>
+
+                            <!-- Current Incident Header -->
+                            <div style="margin-bottom: 1.25rem; padding: 0.85rem 1rem; background: rgba(0,0,0,0.35); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                                <div style="font-size: 0.78rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">
+                                    CURRENT INCIDENT:
+                                </div>
+                                <div id="currentIncidentPreview" style="font-size: 0.9rem; color: #f8fafc; font-weight: 500;">
+                                    Possible brute-force attack.
+                                </div>
+                            </div>
+
+                            <!-- Historical Memories List -->
+                            <div id="hindsightMatchesContainer">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Incident Resolution Modal -->
+            <div id="resolveModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(6px);">
+                <div class="card" style="width:92%; max-width:640px; max-height:90vh; overflow-y:auto; background:var(--bg-secondary); border:1px solid var(--accent-emerald); box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+                    <div class="card-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1rem; margin-bottom:1.25rem;">
+                        <div>
+                            <h3 class="card-title" style="color:var(--accent-emerald); font-size:1.15rem; font-weight:700; display:flex; align-items:center; gap:0.5rem;">
+                                <span>🛡️</span> 8. INCIDENT RESOLUTION
+                            </h3>
+                            <div style="font-size:0.78rem; color:#94a3b8; margin-top:0.3rem; line-height:1.4;">
+                                Record verified resolution data to finalize the incident and store its useful knowledge in <strong>Hindsight persistent memory</strong>.
+                            </div>
+                        </div>
+                        <button type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;" onclick="closeResolveModal()">✕</button>
+                    </div>
+
+                    <form onsubmit="handleFinalizeResolution(event)">
+                        <!-- 1. Root Cause -->
+                        <div class="form-group" style="margin-bottom:0.85rem;">
+                            <label class="form-label" style="font-weight:600; color:#f8fafc;">• Root cause *</label>
+                            <input type="text" id="modal_root_cause" class="form-control" placeholder="Confirmed root cause and vulnerability vector..." required>
+                        </div>
+
+                        <!-- 2. Actions Taken -->
+                        <div class="form-group" style="margin-bottom:0.85rem;">
+                            <label class="form-label" style="font-weight:600; color:#f8fafc;">• Actions taken *</label>
+                            <textarea id="modal_actions" class="form-control" rows="2" placeholder="Containment, isolation, credential rotation steps applied..." required></textarea>
+                        </div>
+
+                        <!-- 3. Final Resolution -->
+                        <div class="form-group" style="margin-bottom:0.85rem;">
+                            <label class="form-label" style="font-weight:600; color:#f8fafc;">• Final resolution *</label>
+                            <textarea id="modal_resolution" class="form-control" rows="2" placeholder="Summary of successful mitigation and system restoration..." required></textarea>
+                        </div>
+
+                        <!-- 4. Lessons Learned -->
+                        <div class="form-group" style="margin-bottom:0.85rem;">
+                            <label class="form-label" style="font-weight:600; color:#f8fafc;">• Lessons learned (Stored in Hindsight)</label>
+                            <textarea id="modal_lessons" class="form-control" rows="2" placeholder="What should the security team and AI remember next time this attack happens?"></textarea>
+                        </div>
+
+                        <!-- 5. Analyst Comments -->
+                        <div class="form-group" style="margin-bottom:1.25rem;">
+                            <label class="form-label" style="font-weight:600; color:#f8fafc;">• Analyst comments</label>
+                            <input type="text" id="modal_feedback" class="form-control" placeholder="Analyst feedback on AI triage accuracy and playbook efficiency">
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.08); padding-top:1rem;">
+                            <div style="font-size:0.75rem; color:#a78bfa; display:flex; align-items:center; gap:0.35rem;">
+                                <span>🧠</span> Knowledge will be indexed in Hindsight memory bank.
+                            </div>
+                            <div style="display:flex; gap:0.75rem;">
+                                <button type="button" class="btn btn-outline" onclick="closeResolveModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, var(--accent-emerald), #059669); border-color:var(--accent-emerald); font-weight:600;">
+                                    💾 Save & Store in Hindsight
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let currentIncidentId = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Set default timestamp to ISO now
+            document.getElementById("inc_time").value = new Date().toISOString().replace("T", " ").substring(0, 19);
+
+            // Check if incident ID in URL param
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get("id");
+            if (id) {
+                loadExistingIncident(id);
+            }
+        });
+
+        // Demo Templates
+        const DEMO_TEMPLATES = {
+            hostile: {
+                title: "Threat to Life & Violent Statement Alert: 'he was killing me'",
+                type: "Physical Threat & Hostile Statement",
+                severity: "AUTO",
+                system: "Internal Slack & Campus Badge Access",
+                ip: "172.16.40.15",
+                user: "contractor_disgruntled@sentinelcorp.internal",
+                desc: "User posted violent and threatening statement: 'he was killing me, I will harm anyone on site and destroy the office'.",
+                logs: "Slack DLP Alert: Critical ThreatMatch 'killing me' 'harm anyone' 'destroy'. Origin: Campus Building B."
+            },
+            abusive: {
+                title: "Toxic Workplace Communication & Abusive Harassment",
+                type: "Physical Threat & Hostile Statement",
+                severity: "AUTO",
+                system: "Microsoft Teams #general & Helpdesk",
+                ip: "10.0.8.44",
+                user: "hostile_employee@sentinelcorp.internal",
+                desc: "User submitted toxic profanity, abusive insults, and threats: 'you idiot bastard, I will ruin you and make you pay'.",
+                logs: "Teams DLP Monitor: High-severity Alert: Profanity, targeted toxic harassment, and verbal threats detected."
+            },
+            bruteforce: {
+                title: "Distributed SSH Brute-Force on Bastion Host",
+                type: "Brute-Force Attack",
+                severity: "HIGH",
+                system: "bastion-auth-gateway-02",
+                ip: "194.26.29.188",
+                user: "root",
+                desc: "Over 38,000 failed SSH authentication attempts detected in 5 minutes targeting root and admin accounts.",
+                logs: "sshd[14920]: Failed password for invalid user admin from 194.26.29.188 port 51230 ssh2\nsshd[14921]: Failed password for root from 194.26.29.188 port 51232 ssh2\nMax retries exceeded; connection dropped by rate limiter."
+            },
+            phishing: {
+                title: "Finance Officer Targeted with Rogue OAuth Application Consent",
+                type: "Phishing Attempt",
+                severity: "HIGH",
+                system: "Microsoft 365 / Entra ID",
+                ip: "185.220.101.42",
+                user: "cfo@sentinelcorp.internal",
+                desc: "Executive received a spoofed security alert email prompting consent for an enterprise application named 'Office 365 Cloud Fixer'.",
+                logs: "AuditLog: UserConsentAction: user=cfo@sentinelcorp.internal app_name='Office 365 Cloud Fixer' permissions=[Mail.ReadWrite, Files.ReadWrite.All]"
+            },
+            malware: {
+                title: "Unauthorized Mining Binary Spawned in Production Pod",
+                type: "Malware Detection",
+                severity: "MEDIUM",
+                system: "k8s-worker-prod-03",
+                ip: "45.154.255.90",
+                user: "system:serviceaccount:default",
+                desc: "Falco runtime alert: xmrig process spawned inside order-processing microservice container.",
+                logs: "Falco: Notice A shell was spawned in container with parent nginx (user=root process=xmrig args=-o pool.supportxmr.com:443)"
+            },
+            dataexfil: {
+                title: "Spike in Unauthenticated S3 Bucket Downloads",
+                type: "Data-Access Anomaly",
+                severity: "HIGH",
+                system: "s3://sentinel-database-backups",
+                ip: "198.51.100.99",
+                user: "ci-cd-token",
+                desc: "CloudWatch alert: 800 GB of compressed customer database archives downloaded in 8 minutes by unrecognized IP.",
+                logs: "CloudTrail: GetObject event spike; IP=198.51.100.99 UserAgent=aws-sdk-go/v1.34 Bucket=sentinel-database-backups"
+            }
+        };
+
+        function loadDemoScenario(key) {
+            const tmpl = DEMO_TEMPLATES[key];
+            if (!tmpl) return;
+            document.getElementById("inc_title").value = tmpl.title;
+            document.getElementById("inc_type").value = tmpl.type;
+            document.getElementById("inc_severity").value = tmpl.severity;
+            document.getElementById("inc_system").value = tmpl.system;
+            document.getElementById("inc_ip").value = tmpl.ip;
+            document.getElementById("inc_user").value = tmpl.user;
+            document.getElementById("inc_desc").value = tmpl.desc;
+            document.getElementById("inc_logs").value = tmpl.logs;
+            document.getElementById("inc_time").value = new Date().toISOString().replace("T", " ").substring(0, 19);
+        }
+
+        function resetForm() {
+            document.getElementById("incidentForm").reset();
+            document.getElementById("inc_time").value = new Date().toISOString().replace("T", " ").substring(0, 19);
+            document.getElementById("resultsContainer").style.display = "none";
+            currentIncidentId = null;
+        }
+
+        // Handle Form Submit & AI Triage
+        async function handleAnalyzeIncident(e) {
+            e.preventDefault();
+            const btn = document.getElementById("analyzeBtn");
+            btn.disabled = true;
+            btn.innerHTML = "⏳ Querying Hindsight & AI...";
+
+            try {
+                // 1. Create incident record
+                const payload = {
+                    title: document.getElementById("inc_title").value,
+                    type: document.getElementById("inc_type").value,
+                    severity: document.getElementById("inc_severity").value,
+                    description: document.getElementById("inc_desc").value,
+                    source_ip: document.getElementById("inc_ip").value || null,
+                    username: document.getElementById("inc_user").value || null,
+                    affected_system: document.getElementById("inc_system").value || null,
+                    additional_logs: document.getElementById("inc_logs").value || null
+                };
+
+                const createRes = await fetch("/api/incidents", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (!createRes.ok) throw new Error("Failed to create incident");
+                const newInc = await createRes.json();
+                currentIncidentId = newInc.id;
+
+                // 2. Trigger AI + Hindsight Investigation
+                const analyzeRes = await fetch(`/api/incidents/${newInc.id}/analyze?use_hindsight=true`, {
+                    method: "POST"
+                });
+                if (!analyzeRes.ok) throw new Error("Failed to run AI investigation");
+                const resData = await analyzeRes.json();
+
+                renderInvestigationResults(newInc, resData.analysis, resData.similar_incidents);
+
+            } catch (err) {
+                alert("Error analyzing incident: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "⚡ Analyze Incident (AI + Hindsight)";
+            }
+        }
+
+        // Load existing incident by ID
+        async function loadExistingIncident(id) {
+            try {
+                const res = await fetch(`/api/incidents/${id}`);
+                if (!res.ok) return;
+                const inc = await res.json();
+                currentIncidentId = inc.id;
+
+                document.getElementById("inc_title").value = inc.title;
+                document.getElementById("inc_type").value = inc.type;
+                document.getElementById("inc_severity").value = inc.severity;
+                document.getElementById("inc_system").value = inc.affected_system || "";
+                document.getElementById("inc_ip").value = inc.source_ip || "";
+                document.getElementById("inc_user").value = inc.username || "";
+                document.getElementById("inc_desc").value = inc.description;
+                document.getElementById("inc_logs").value = inc.additional_logs || "";
+                document.getElementById("inc_time").value = inc.timestamp || inc.created_at;
+
+                // If incident already has analysis, show it
+                if (inc.ai_analysis) {
+                    const similarRes = await fetch(`/api/incidents/${id}/similar`);
+                    const simData = await similarRes.json();
+                    renderInvestigationResults(inc, inc.ai_analysis, simData.similar_memories || []);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderInvestigationResults(inc, analysis, similarMemories) {
+            const container = document.getElementById("resultsContainer");
+            container.style.display = "block";
+            container.scrollIntoView({ behavior: "smooth" });
+
+            document.getElementById("activeIncidentBadge").textContent = `Incident ${inc.id} (${inc.status})`;
+
+            // Severity Badge (AI Evaluated)
+            const sev = (analysis.severity_assessment || inc.severity || "MEDIUM").toUpperCase();
+            const sevBadge = document.getElementById("resSeverityBadge");
+            if (sevBadge) {
+                sevBadge.textContent = `AI Evaluated: ${sev}`;
+                sevBadge.className = `badge badge-${sev === 'HIGH' ? 'high' : (sev === 'LOW' ? 'low' : 'med')}`;
+            }
+
+            // Classification & Root cause
+            document.getElementById("resClassification").textContent = analysis.incident_classification || inc.type;
+            document.getElementById("resExplanation").textContent = analysis.explanation || "Automated AI triage completed.";
+            document.getElementById("resRootCause").textContent = analysis.possible_root_cause || "Analysis in progress";
+
+            // Match Header
+            const matchHeader = document.getElementById("resMatchHeader");
+            if (matchHeader) {
+                if (similarMemories && similarMemories.length > 0) {
+                    matchHeader.textContent = `Similar previous incident found (${similarMemories[0].id} - ${similarMemories[0].similarity} match).`;
+                } else {
+                    matchHeader.textContent = "No previous identical incident found (Standard SOC Playbook).";
+                }
+            }
+
+            // Reason for Recommendation
+            const reasonEl = document.getElementById("resReason");
+            if (reasonEl) {
+                reasonEl.textContent = analysis.reason_for_recommendation || "Tailored response strategy synthesizing current attack surface indicators with verified defensive containment actions.";
+            }
+
+            // Historical Evidence (Clearly Labeled)
+            const evidenceEl = document.getElementById("resEvidence");
+            if (evidenceEl) {
+                evidenceEl.textContent = analysis.historical_evidence || (
+                    similarMemories && similarMemories.length > 0
+                        ? `Historical incident ${similarMemories[0].id} ('${similarMemories[0].title}') confirmed that applying these containment steps resolved the attack with zero unauthorized persistence.`
+                        : "Standard SOC baseline playbook — no prior historical incident matched."
+                );
+            }
+
+            // Indicators
+            const indList = document.getElementById("resIndicators");
+            indList.innerHTML = (analysis.indicators || [inc.description]).map(i => `<li class="step-item">${i}</li>`).join("");
+
+            // Prevention Suggestions
+            const prevList = document.getElementById("resPrevention");
+            if (prevList) {
+                prevList.innerHTML = (analysis.prevention_suggestions || [
+                    "Enforce strict multi-factor authentication (MFA)",
+                    "Audit perimeter firewall and access control lists regularly"
+                ]).map(p => `<li class="step-item" style="color:var(--accent-emerald);">${p}</li>`).join("");
+            }
+
+            // Numbered Investigation Steps
+            const stepList = document.getElementById("resInvestigationSteps");
+            if (stepList) {
+                stepList.innerHTML = (analysis.investigation_steps || [
+                    "Check authentication logs",
+                    "Verify account activity",
+                    "Investigate source IP"
+                ]).map(s => `<li>${s}</li>`).join("");
+            }
+
+            // Numbered Recommended Response Actions
+            const actList = document.getElementById("resActions");
+            if (actList) {
+                actList.innerHTML = (analysis.recommended_response || [
+                    "Reset credentials",
+                    "Enable MFA",
+                    "Block suspicious IP"
+                ]).map(a => `<li>${a}</li>`).join("");
+            }
+
+            // Update Current Incident Preview
+            const curPreview = document.getElementById("currentIncidentPreview");
+            if (curPreview) {
+                curPreview.textContent = inc.title ? `${inc.title} - ${inc.description}` : "Possible brute-force attack.";
+            }
+
+            // Render Similar Historical Incidents from Hindsight
+            const matchesContainer = document.getElementById("hindsightMatchesContainer");
+            if (!similarMemories || similarMemories.length === 0) {
+                matchesContainer.innerHTML = `<div style="color:var(--text-muted); font-size:0.82rem; padding:1rem; text-align:center;">No direct historical matches found in Hindsight memory.</div>`;
+                return;
+            }
+
+            matchesContainer.innerHTML = similarMemories.map((mem, idx) => {
+                // Split resolution actions into clean bullet points
+                let resolutionItems = [];
+                const rawRes = mem.actions_taken || mem.successful_resolution || "";
+                if (rawRes.includes("\n")) {
+                    resolutionItems = rawRes.split("\n").map(s => s.replace(/^[-*•\d.]\s*/, '').trim()).filter(Boolean);
+                } else if (rawRes.includes(",")) {
+                    resolutionItems = rawRes.split(",").map(s => s.replace(/^[-*•\d.]\s*/, '').trim()).filter(Boolean);
+                } else if (rawRes.includes(";")) {
+                    resolutionItems = rawRes.split(";").map(s => s.replace(/^[-*•\d.]\s*/, '').trim()).filter(Boolean);
+                } else {
+                    resolutionItems = [rawRes];
+                }
+
+                if (resolutionItems.length === 0) {
+                    resolutionItems = ["Reset credentials", "Enable MFA", "Block suspicious IP"];
+                }
+
+                const bulletList = resolutionItems.slice(0, 4).map(item => `<li style="margin-bottom:0.25rem;">${item}</li>`).join("");
+                const incShortNumber = mem.id.replace("INC-2026-", "").replace("INC-", "#");
+
+                return `
+                <div class="memory-card-highlight" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 1rem;">
+                    <!-- Section Tag -->
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span>HISTORICAL MEMORY:</span>
+                        <span class="badge badge-resolved" style="background:rgba(139,92,246,0.2); color:var(--accent-purple); border-color:rgba(139,92,246,0.4); font-size:0.75rem;">
+                            Match ${idx + 1}
+                        </span>
+                    </div>
+
+                    <!-- Incident ID -->
+                    <div style="font-size: 1rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem;">
+                        Incident ${incShortNumber} <span style="font-size:0.8rem; font-weight:normal; color:#94a3b8;">(${mem.title || mem.id})</span>
+                    </div>
+
+                    <!-- Similarity -->
+                    <div style="font-size: 0.88rem; color: #38bdf8; font-weight: 700; margin-bottom: 0.5rem;">
+                        Similarity: ${mem.similarity}
+                    </div>
+
+                    <!-- Root Cause -->
+                    <div style="font-size: 0.85rem; color: #e2e8f0; margin-bottom: 0.65rem; line-height: 1.5;">
+                        <span style="color: #94a3b8; font-weight: 600;">Root Cause:</span> ${mem.root_cause}
+                    </div>
+
+                    <!-- Successful Resolution -->
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: #94a3b8; margin-bottom: 0.35rem;">
+                            Successful Resolution:
+                        </div>
+                        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.84rem; color: #34d399; line-height: 1.6;">
+                            ${bulletList}
+                        </ul>
+                    </div>
+                </div>
+                `;
+            }).join("");
+        }
+
+        // Copy Card Text to Clipboard (Exact Spec Format)
+        function copyRecommendationCard() {
+            const header = document.getElementById("resMatchHeader") ? document.getElementById("resMatchHeader").textContent : "Similar previous incident found.";
+            const steps = Array.from(document.querySelectorAll("#resInvestigationSteps li")).map((li, i) => `${i+1}. ${li.textContent}`).join("\n");
+            const actions = Array.from(document.querySelectorAll("#resActions li")).map((li, i) => `${i+1}. ${li.textContent}`).join("\n");
+            const reason = document.getElementById("resReason") ? document.getElementById("resReason").textContent.trim() : "Automated defense-in-depth isolation procedure tailored to verified attack telemetry.";
+            const evidence = document.getElementById("resEvidence") ? document.getElementById("resEvidence").textContent.trim() : "A previous similar incident was successfully resolved using these actions.";
+
+            const cardText = `6. MEMORY-AWARE RECOMMENDATION\n\n${header}\n\nRecommended investigation steps:\n${steps}\n\nRecommended response:\n${actions}\n\nReason for recommendation:\n${reason}\n\nHistorical evidence supporting the recommendation [HISTORICAL INFORMATION]:\n${evidence}`;
+
+            navigator.clipboard.writeText(cardText).then(() => {
+                showToast("6. Memory-Aware Recommendation copied to clipboard!", "success");
+            }).catch(err => {
+                showToast("Copied recommendation text.", "success");
+            });
+        }
+
+        // Modern Toast Notification Helper
+        function showToast(message, type = "success") {
+            let toast = document.getElementById("socToast");
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "socToast";
+                toast.style.position = "fixed";
+                toast.style.bottom = "24px";
+                toast.style.right = "24px";
+                toast.style.padding = "12px 20px";
+                toast.style.borderRadius = "8px";
+                toast.style.fontSize = "0.85rem";
+                toast.style.fontWeight = "600";
+                toast.style.zIndex = "9999";
+                toast.style.boxShadow = "0 10px 25px rgba(0,0,0,0.5)";
+                toast.style.display = "flex";
+                toast.style.alignItems = "center";
+                toast.style.gap = "8px";
+                toast.style.transition = "all 0.3s ease";
+                document.body.appendChild(toast);
+            }
+
+            if (type === "success") {
+                toast.style.background = "linear-gradient(135deg, #065f46, #047857)";
+                toast.style.color = "#ecfdf5";
+                toast.style.border = "1px solid #10b981";
+                toast.innerHTML = `<span>✓</span> <span>${message}</span>`;
+            } else if (type === "reject") {
+                toast.style.background = "linear-gradient(135deg, #881337, #9f1239)";
+                toast.style.color = "#fff1f2";
+                toast.style.border = "1px solid #f43f5e";
+                toast.innerHTML = `<span>✕</span> <span>${message}</span>`;
+            } else {
+                toast.style.background = "linear-gradient(135deg, #1e1b4b, #312e81)";
+                toast.style.color = "#e0e7ff";
+                toast.style.border = "1px solid #6366f1";
+                toast.innerHTML = `<span>ℹ</span> <span>${message}</span>`;
+            }
+
+            toast.style.opacity = "1";
+            toast.style.transform = "translateY(0)";
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(10px)";
+            }, 3500);
+        }
+
+        function handleApproveAction() {
+            const btnRow = document.getElementById("decisionButtonRow");
+            if (btnRow) {
+                btnRow.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:0.75rem; width:100%; justify-content:space-between; flex-wrap:wrap;">
+                        <span class="badge badge-resolved" style="padding:0.45rem 0.85rem; font-size:0.8rem; background:rgba(16,185,129,0.2);">
+                            ✓ RECOMMENDATION APPROVED & AUTHORIZED
+                        </span>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openResolveModal('approved')">
+                            ✓ Finalize Resolution & Save to Hindsight →
+                        </button>
+                    </div>
+                `;
+            }
+            showToast("Recommendation Approved! Mitigation plan authorized.", "success");
+        }
+
+        function handleRejectAction() {
+            const btnRow = document.getElementById("decisionButtonRow");
+            if (btnRow) {
+                btnRow.innerHTML = `
+                    <div style="width:100%; display:flex; flex-direction:column; gap:0.5rem; background:rgba(244,63,94,0.06); border:1px solid rgba(244,63,94,0.3); padding:0.75rem; border-radius:6px;">
+                        <div style="font-size:0.78rem; font-weight:700; color:var(--accent-rose);">
+                            ✕ SELECT REJECTION REASON:
+                        </div>
+                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                            <button type="button" class="scenario-pill" onclick="confirmRejection('False positive detection')">False Positive</button>
+                            <button type="button" class="scenario-pill" onclick="confirmRejection('Alternative firewall policy preferred')">Alternative Firewall Policy</button>
+                            <button type="button" class="scenario-pill" onclick="confirmRejection('Requires tier-3 escalation')">Escalate to Tier-3</button>
+                            <button type="button" class="scenario-pill" onclick="confirmRejection('Custom containment applied')">Custom Containment</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function confirmRejection(reason) {
+            const btnRow = document.getElementById("decisionButtonRow");
+            if (btnRow) {
+                btnRow.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:0.75rem; width:100%; justify-content:space-between; flex-wrap:wrap;">
+                        <span class="badge badge-high" style="padding:0.45rem 0.85rem; font-size:0.8rem;">
+                            ✕ REJECTED: ${reason.toUpperCase()}
+                        </span>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="openResolveModal('rejected', '${reason}')">
+                            Record Custom Resolution & Lessons Learned →
+                        </button>
+                    </div>
+                `;
+            }
+            showToast(`Rejected: ${reason}. Feedback logged for Hindsight learning.`, "reject");
+        }
+
+        function openResolveModal(statusType = 'approved', customReason = '') {
+            const modal = document.getElementById("resolveModal");
+            modal.style.display = "flex";
+            const rootCauseEl = document.getElementById("resRootCause");
+            document.getElementById("modal_root_cause").value = rootCauseEl.textContent !== "--" ? rootCauseEl.textContent : "Exposed authentication surface";
+            
+            if (statusType === 'approved') {
+                document.getElementById("modal_actions").value = "Approved and applied recommended perimeter firewall rules, rotated credentials, and enabled MFA.";
+                document.getElementById("modal_resolution").value = "Mitigation verified; zero unauthorized persistence detected.";
+                document.getElementById("modal_lessons").value = "Enforce key-only authentication with continuous port exposure monitoring.";
+                document.getElementById("modal_feedback").value = "AI recommendation approved by SOC Analyst.";
+            } else {
+                document.getElementById("modal_actions").value = `Custom action applied: ${customReason || 'Manual override'}.`;
+                document.getElementById("modal_resolution").value = "Handled via custom SOC analyst mitigation procedure.";
+                document.getElementById("modal_lessons").value = `Analyst note: ${customReason}. Update playbooks accordingly.`;
+                document.getElementById("modal_feedback").value = `Rejected AI plan due to: ${customReason}`;
+            }
+        }
+
+        function closeResolveModal() {
+            document.getElementById("resolveModal").style.display = "none";
+        }
+
+        async function handleFinalizeResolution(e) {
+            e.preventDefault();
+            if (!currentIncidentId) return;
+
+            const payload = {
+                root_cause: document.getElementById("modal_root_cause").value,
+                actions_taken: document.getElementById("modal_actions").value,
+                successful_resolution: document.getElementById("modal_resolution").value,
+                lessons_learned: document.getElementById("modal_lessons").value,
+                analyst_feedback: document.getElementById("modal_feedback").value,
+                store_in_hindsight: true
+            };
+
+            try {
+                const res = await fetch(`/api/incidents/${currentIncidentId}/resolve`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error("Failed to resolve incident");
+                closeResolveModal();
+                showToast(`Incident ${currentIncidentId} resolved and saved to Hindsight memory!`, "success");
+                setTimeout(() => {
+                    window.location.href = "/dashboard";
+                }, 1200);
+            } catch (err) {
+                showToast("Error resolving incident: " + err.message, "reject");
+            }
+        }
+    </script>
+</body>
+</html>
